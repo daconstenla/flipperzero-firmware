@@ -11,6 +11,8 @@
 
 #include <stm32wbxx_ll_dma.h>
 
+#include <lib/flipper_format/flipper_format.h>
+
 #include <furi.h>
 #include <cc1101.h>
 #include <stdio.h>
@@ -28,6 +30,52 @@ volatile FuriHalSubGhz furi_hal_subghz = {
     .regulation = SubGhzRegulationTxRx,
     .preset = FuriHalSubGhzPresetIDLE,
 };
+
+static const uint8_t furi_hal_subghz_preset_ook_async_patable[8] = {
+    0x00,
+    0xC0, // 12dBm 0xC0, 10dBm 0xC5, 7dBm 0xCD, 5dBm 0x86, 0dBm 0x50, -6dBm 0x37, -10dBm 0x26, -15dBm 0x1D, -20dBm 0x17, -30dBm 0x03
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00};
+static const uint8_t furi_hal_subghz_preset_ook_async_patable_au[8] = {
+    0x00,
+    0xC0, // 12dBm 0xC0, 10dBm 0xC5, 7dBm 0xCD, 5dBm 0x86, 0dBm 0x50, -6dBm 0x37, -10dBm 0x26, -15dBm 0x1D, -20dBm 0x17, -30dBm 0x03
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00};
+static const uint8_t furi_hal_subghz_preset_2fsk_async_patable[8] = {
+    0xC0, // 10dBm 0xC0, 7dBm 0xC8, 5dBm 0x84, 0dBm 0x60, -10dBm 0x34, -15dBm 0x1D, -20dBm 0x0E, -30dBm 0x12
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00};
+static const uint8_t furi_hal_subghz_preset_msk_async_patable[8] = {
+    0xC0, // 10dBm 0xC0, 7dBm 0xC8, 5dBm 0x84, 0dBm 0x60, -10dBm 0x34, -15dBm 0x1D, -20dBm 0x0E, -30dBm 0x12
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00};
+static const uint8_t furi_hal_subghz_preset_gfsk_async_patable[8] = {
+    0xC0, // 10dBm 0xC0, 7dBm 0xC8, 5dBm 0x84, 0dBm 0x60, -10dBm 0x34, -15dBm 0x1D, -20dBm 0x0E, -30dBm 0x12
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00};
 
 void furi_hal_subghz_init() {
     furi_assert(furi_hal_subghz.state == SubGhzStateInit);
@@ -285,10 +333,35 @@ uint8_t furi_hal_subghz_get_lqi() {
     return data[0] & 0x7F;
 }
 
+/*
+ Modified by @tkerby to the full YARD Stick One extended range of 281-361 MHz, 378-481 MHz, and 749-962 MHz.
+ These changes are at your own risk. The PLL may not lock and FZ devs have warned of possible damage!
+ */
 bool furi_hal_subghz_is_frequency_valid(uint32_t value) {
+    bool is_extended = false;
+
+    // TODO: Move file check to another place
+    Storage* storage = furi_record_open("storage");
+    FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
+
+    if(flipper_format_file_open_existing(fff_data_file, "/ext/subghz/assets/dangerous_settings")) {
+        flipper_format_read_bool(
+            fff_data_file, "yes_i_want_to_destroy_my_flipper", &is_extended, 1);
+    }
+
+    flipper_format_free(fff_data_file);
+    furi_record_close("storage");
+
     if(!(value >= 299999755 && value <= 348000335) &&
        !(value >= 386999938 && value <= 464000000) &&
-       !(value >= 778999847 && value <= 928000000)) {
+       !(value >= 778999847 && value <= 928000000) && !(is_extended)) {
+        FURI_LOG_I(TAG, "Frequency blocked - outside default range");
+        return false;
+    } else if(
+        !(value >= 281000000 && value <= 361000000) &&
+        !(value >= 378000000 && value <= 481000000) &&
+        !(value >= 749000000 && value <= 962000000) && is_extended) {
+        FURI_LOG_I(TAG, "Frequency blocked - outside dangerous range");
         return false;
     }
 
@@ -296,17 +369,67 @@ bool furi_hal_subghz_is_frequency_valid(uint32_t value) {
 }
 
 uint32_t furi_hal_subghz_set_frequency_and_path(uint32_t value) {
+    // Set these values to the extended frequency range only. They dont define if you can transmit but do select the correct RF path
     value = furi_hal_subghz_set_frequency(value);
-    if(value >= 299999755 && value <= 348000335) {
+    if(value >= 281000000 && value <= 361000000) {
         furi_hal_subghz_set_path(FuriHalSubGhzPath315);
-    } else if(value >= 386999938 && value <= 464000000) {
+    } else if(value >= 378000000 && value <= 481000000) {
         furi_hal_subghz_set_path(FuriHalSubGhzPath433);
-    } else if(value >= 778999847 && value <= 928000000) {
+    } else if(value >= 749000000 && value <= 962000000) {
         furi_hal_subghz_set_path(FuriHalSubGhzPath868);
     } else {
         furi_crash("SubGhz: Incorrect frequency during set.");
     }
     return value;
+}
+
+bool furi_hal_subghz_is_tx_allowed(uint32_t value) {
+    UNUSED(value);
+    // Removed region check
+    return true;
+    //checking regional settings
+    bool is_allowed = false;
+    switch(furi_hal_version_get_hw_region()) {
+    case FuriHalVersionRegionEuRu:
+        //433,05..434,79; 868,15..868,55
+    if(!(value >= 299999755 && value <= 348000335) &&
+       !(value >= 386999938 && value <= 464000000) &&
+       !(value >= 778999847 && value <= 928000000)) {
+        } else {
+            is_allowed = true;
+        }
+        break;
+    case FuriHalVersionRegionUsCaAu:
+        //304,10..321,95; 433,05..434,79; 915,00..928,00
+    if(!(value >= 299999755 && value <= 348000335) &&
+       !(value >= 386999938 && value <= 464000000) &&
+       !(value >= 778999847 && value <= 928000000)) {
+        } else {
+            if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
+                if((value >= 304100000 && value <= 321950000) &&
+                   ((furi_hal_subghz.preset == FuriHalSubGhzPresetOok270Async) ||
+                    (furi_hal_subghz.preset == FuriHalSubGhzPresetOok650Async))) {
+                    furi_hal_subghz_load_patable(furi_hal_subghz_preset_ook_async_patable_au);
+                }
+            }
+            is_allowed = true;
+        }
+        break;
+    case FuriHalVersionRegionJp:
+        //312,00..315,25; 920,50..923,50
+    if(!(value >= 299999755 && value <= 348000335) &&
+       !(value >= 386999938 && value <= 464000000) &&
+       !(value >= 778999847 && value <= 928000000)) {
+        } else {
+            is_allowed = true;
+        }
+        break;
+
+    default:
+        is_allowed = true;
+        break;
+    }
+    return is_allowed;
 }
 
 uint32_t furi_hal_subghz_set_frequency(uint32_t value) {
