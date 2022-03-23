@@ -18,7 +18,7 @@ void cli_command_device_info_callback(const char* key, const char* value, bool l
     printf("%-30s: %s\r\n", key, value);
 }
 
-/* 
+/*
  * Device Info Command
  * This command is intended to be used by humans
  */
