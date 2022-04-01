@@ -324,7 +324,7 @@ uint64_t subghz_protocol_nice_flor_s_encrypt(uint64_t data, const char* file_nam
     k = ~p[3];
     p[3] = ~p[1];
     p[1] = k;
-    FURI_LOG_I(TAG, "encrypted_data = %016llX", data);
+    FURI_LOG_I(TAG, "encrypted_data = %016X", data);
     return data;
 }
 
@@ -363,7 +363,7 @@ static uint64_t
             p[1] = k;
         }
     }
-    FURI_LOG_I(TAG, "decrypted_data = %016llX", data);
+    FURI_LOG_I(TAG, "decrypted_data = %016X", data);
     return data;
 }
 
