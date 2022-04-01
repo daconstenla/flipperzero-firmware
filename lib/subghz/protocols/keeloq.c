@@ -496,7 +496,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                 // https://phreakerclub.com/forum/showpost.php?p=43557&postcount=37
                 man = subghz_protocol_keeloq_common_normal_learning(fix, manufacture_code->key);
                 FURI_LOG_I(TAG, "mfkey: %llX", manufacture_code->key);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -507,7 +506,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                 man = subghz_protocol_keeloq_common_secure_learning(
                     fix, seed, manufacture_code->key);
                 FURI_LOG_I(TAG, "mfkey: %llX", manufacture_code->key);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -518,7 +516,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                 man = subghz_protocol_keeloq_common_magic_xor_type1_learning(
                     fix, manufacture_code->key);
                 FURI_LOG_I(TAG, "mfkey: %llX", manufacture_code->key);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -540,8 +537,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                     man_rev_byte = (uint8_t)(manufacture_code->key >> i);
                     man_rev = man_rev | man_rev_byte << (56 - i);
                 }
-                FURI_LOG_I(TAG, "man_learning_rev: %llX", man_rev);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man_rev);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -552,7 +547,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                 // https://phreakerclub.com/forum/showpost.php?p=43557&postcount=37
                 man = subghz_protocol_keeloq_common_normal_learning(fix, manufacture_code->key);
                 FURI_LOG_I(TAG, "mfkey: %llX", manufacture_code->key);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -561,8 +555,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
 
                 // Check for mirrored man
                 man = subghz_protocol_keeloq_common_normal_learning(fix, man_rev);
-                FURI_LOG_I(TAG, "man_learning_rev: %llX", man_rev);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -573,7 +565,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                 man = subghz_protocol_keeloq_common_secure_learning(
                     fix, seed, manufacture_code->key);
                 FURI_LOG_I(TAG, "mfkey: %llX", manufacture_code->key);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -582,8 +573,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
 
                 // Check for mirrored man
                 man = subghz_protocol_keeloq_common_secure_learning(fix, seed, man_rev);
-                FURI_LOG_I(TAG, "man_learning_rev: %llX", man_rev);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -594,7 +583,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                 man = subghz_protocol_keeloq_common_magic_xor_type1_learning(
                     fix, manufacture_code->key);
                 FURI_LOG_I(TAG, "mfkey: %llX", manufacture_code->key);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
@@ -603,8 +591,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
 
                 // Check for mirrored man
                 man = subghz_protocol_keeloq_common_magic_xor_type1_learning(fix, man_rev);
-                FURI_LOG_I(TAG, "man_learning_rev: %llX", man_rev);
-                FURI_LOG_I(TAG, "man_learning: %llX", man);
                 decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
                 if(subghz_protocol_keeloq_check_decrypt(instance, decrypt, btn, end_serial)) {
                     *manufacture_name = string_get_cstr(manufacture_code->name);
