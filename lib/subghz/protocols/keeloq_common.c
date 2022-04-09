@@ -98,4 +98,3 @@ inline uint64_t
     k2 = subghz_protocol_keeloq_common_encrypt(lsb, key);
     return ((uint64_t)k1 << 32) | k2;
 }
-}
