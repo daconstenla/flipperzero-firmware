@@ -62,11 +62,6 @@ struct SubGhzTxRx {
 
 typedef struct SubGhzTxRx SubGhzTxRx;
 
-typedef struct {
-    uint8_t seed[4];
-    uint8_t seed_len;
-} SeedData;
-
 struct SubGhz {
     Gui* gui;
     NotificationApp* notifications;
@@ -80,7 +75,6 @@ struct SubGhz {
     Popup* popup;
     TextInput* text_input;
     ByteInput* byte_input;
-    SeedData* seed_data;
     Widget* widget;
     DialogsApp* dialogs;
     string_t file_path;
