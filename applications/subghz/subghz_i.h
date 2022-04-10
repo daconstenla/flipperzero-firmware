@@ -21,6 +21,7 @@
 #include <gui/modules/submenu.h>
 #include <gui/modules/popup.h>
 #include <gui/modules/text_input.h>
+#include <gui/modules/byte_input.h>
 #include <gui/modules/widget.h>
 
 #include <subghz/scenes/subghz_scene.h>
@@ -73,6 +74,7 @@ struct SubGhz {
     Submenu* submenu;
     Popup* popup;
     TextInput* text_input;
+    ByteInput* byte_input;
     Widget* widget;
     DialogsApp* dialogs;
     string_t file_path;
