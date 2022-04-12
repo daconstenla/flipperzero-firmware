@@ -41,6 +41,11 @@
 
 #define SUBGHZ_MAX_LEN_NAME 64
 
+typedef struct {
+    uint8_t seed_len;
+    uint8_t seed[4];
+} SeedData;
+
 struct SubGhzTxRx {
     SubGhzWorker* worker;
 
@@ -49,6 +54,7 @@ struct SubGhzTxRx {
     SubGhzTransmitter* transmitter;
     SubGhzProtocolDecoderBase* decoder_result;
     FlipperFormat* fff_data;
+    SeedData* seed_data;
 
     SubGhzPresetDefinition* preset;
     SubGhzHistory* history;
