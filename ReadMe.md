@@ -146,7 +146,7 @@ Connect your device via ST-Link and run:
 
 # Links
 
-* Discord: [flipp.dev/discord](https://flipp.dev/discord)
+* Discord: [discord.gg/58D6E8BtTU](https://discord.gg/58D6E8BtTU)
 * Website: [flipperzero.one](https://flipperzero.one)
 * Kickstarter page: [kickstarter.com](https://www.kickstarter.com/projects/flipper-devices/flipper-zero-tamagochi-for-hackers)
 * Forum: [forum.flipperzero.one](https://forum.flipperzero.one/)
