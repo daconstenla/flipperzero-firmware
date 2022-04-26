@@ -242,15 +242,10 @@ bool subghz_protocol_encoder_faac_slh_deserialize(void* context, FlipperFormat* 
 
         subghz_protocol_faac_slh_check_remote_controller(
             &instance->generic, instance->keystore, &instance->manufacture_name);
-        
+
         //optional parameter parameter
         flipper_format_read_uint32(
             flipper_format, "Repeat", (uint32_t*)&instance->encoder.repeat, 1);
-
-        if(!flipper_format_read_uint32(flipper_format, "SEED", (uint32_t*)&instance->generic.seed, 4)) {
-            FURI_LOG_E(TAG, "Missing SEED");
-            break;
-        }
 
         subghz_protocol_encoder_faac_slh_get_upload(instance);
 
