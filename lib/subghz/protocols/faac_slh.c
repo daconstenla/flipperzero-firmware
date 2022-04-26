@@ -398,7 +398,7 @@ static void subghz_protocol_faac_slh_check_remote_controller
     (SubGhzBlockGeneric* instance,
      SubGhzKeystore* keystore,
      const char** manufacture_name) {
-    
+
     FURI_LOG_I(TAG, "SEED (decrypt init): %8X\n", instance->seed);
     uint32_t code_fix = instance->data >> 32;
     uint32_t code_hop = instance->data & 0xFFFFFFFF;
@@ -426,7 +426,7 @@ static void subghz_protocol_faac_slh_check_remote_controller
         break;
         }
     }
-  
+
     instance->cnt = decrypt & 0xFFFF;
 }
 
@@ -457,11 +457,20 @@ bool subghz_protocol_decoder_faac_slh_deserialize(void* context, FlipperFormat* 
     bool ret = false;
     do {
         if(!subghz_block_generic_deserialize(&instance->generic, flipper_format)) {
+            FURI_LOG_E(TAG, "Deserialize error");
             break;
         }
         if(instance->generic.data_count_bit !=
            subghz_protocol_faac_slh_const.min_count_bit_for_found) {
             FURI_LOG_E(TAG, "Wrong number of bits in key");
+            break;
+        }
+        if(!flipper_format_rewind(flipper_format)) {
+            FURI_LOG_E(TAG, "Rewind error");
+            break;
+        }
+        if(!flipper_format_read_uint32(flipper_format, "SEED", (uint32_t*)&instance->generic.seed, 1)) {
+            FURI_LOG_E(TAG, "Missing SEED");
             break;
         }
         ret = true;
