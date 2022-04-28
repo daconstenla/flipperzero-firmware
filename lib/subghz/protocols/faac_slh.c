@@ -176,6 +176,7 @@ bool subghz_protocol_faac_slh_create_data(
     instance->generic.btn = btn;
     instance->generic.cnt = cnt;
     instance->generic.seed = seed;
+    seed_global = instance->generic.seed;
     instance->manufacture_name = manufacture_name;
     instance->generic.data_count_bit = 64;
     bool res = subghz_protocol_faac_slh_gen_data(instance);
@@ -397,12 +398,15 @@ void subghz_protocol_decoder_faac_slh_feed(void* context, bool level, uint32_t d
 /**
  * Analysis of received data
  * @param instance Pointer to a SubGhzBlockGeneric* instance
+ * @param keystore Pointer to a SubGhzKeystore* instance
+ * @param manifacture_name Manufacturer name
  */
 static void subghz_protocol_faac_slh_check_remote_controller
     (SubGhzBlockGeneric* instance,
      SubGhzKeystore* keystore,
      const char** manufacture_name) {
 
+    instance->seed = seed_global;
     FURI_LOG_I(TAG, "SEED (decrypt init): %8X\n", instance->seed);
     uint32_t code_fix = instance->data >> 32;
     uint32_t code_hop = instance->data & 0xFFFFFFFF;
