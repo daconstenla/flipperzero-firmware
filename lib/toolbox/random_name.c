@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <furi.h>
+#include <furi_hal.h>
 
 void set_random_name(char* name, uint8_t max_name_size) {
     static bool rand_generator_inited = false;

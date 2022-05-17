@@ -5,7 +5,24 @@ Version: 1
 #Add_standard_frequencies: true
 
 # Default Frequency: used as default for "Read" and "Read Raw"
-#Default_frequency: 433920000
+Frequency: 302757000
+Frequency: 307000000
+Frequency: 307500000
+Frequency: 307800000
+Frequency: 309000000
+Frequency: 312000000
+Frequency: 312100000
+Frequency: 313850000
+Frequency: 314000000
+Frequency: 314350000
+Frequency: 345000000
+Frequency: 348000000
+Frequency: 387000000
+Frequency: 433220000
+Frequency: 433889000
+Frequency: 464000000
+Frequency: 779000000
+Frequency: 928000000
 
 # Frequencies used for "Read", "Read Raw" and "Frequency Analyzer"
 #Frequency: 300000000
@@ -16,6 +33,8 @@ Version: 1
 #Hopper_frequency: 300000000
 #Hopper_frequency: 310000000
 #Hopper_frequency: 310000000
+Hopper_frequency: 345000000
+Hopper_frequency: 434420000
 
 # Custom preset
 # format for CC1101 "Custom_preset_data:" XX YY XX YY .. 00 00 ZZ ZZ ZZ ZZ ZZ ZZ ZZ ZZ, where: XX-register, YY - register data, 00 00 - end load register, ZZ - 8 byte Pa table register
