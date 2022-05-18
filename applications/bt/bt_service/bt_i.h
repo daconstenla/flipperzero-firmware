@@ -33,6 +33,7 @@ typedef union {
     uint32_t pin_code;
     uint8_t battery_level;
     BtProfile profile;
+    bool battery_is_charging;
 } BtMessageData;
 
 typedef struct {

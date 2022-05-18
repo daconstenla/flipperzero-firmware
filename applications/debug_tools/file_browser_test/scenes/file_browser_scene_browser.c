@@ -1,6 +1,11 @@
 #include "../file_browser_app_i.h"
+<<<<<<< HEAD
 #include <core/check.h>
 #include <core/log.h>
+=======
+#include "furi/check.h"
+#include "furi/log.h"
+>>>>>>> fec752331 (upd wplugins)
 #include "furi_hal.h"
 #include "m-string.h"
 
@@ -20,10 +25,19 @@ bool file_browser_scene_browser_on_event(void* context, SceneManagerEvent event)
     return consumed;
 }
 
+<<<<<<< HEAD
 static void file_browser_callback(void* context) {
     FileBrowserApp* app = context;
     furi_assert(app);
     view_dispatcher_send_custom_event(app->view_dispatcher, SceneManagerEventTypeCustom);
+=======
+static void file_browser_callback(void* context, bool state) {
+    FileBrowserApp* app = context;
+    furi_assert(app);
+    view_dispatcher_send_custom_event(app->view_dispatcher, SceneManagerEventTypeCustom);
+
+    UNUSED(state);
+>>>>>>> fec752331 (upd wplugins)
 }
 
 void file_browser_scene_browser_on_enter(void* context) {

@@ -399,7 +399,11 @@ int32_t bt_srv(void* p) {
             // Update battery level
             furi_hal_bt_update_battery_level(message.data.battery_level);
         } else if(message.type == BtMessageTypeUpdatePowerState) {
+<<<<<<< HEAD
             furi_hal_bt_update_power_state();
+=======
+            furi_hal_bt_update_power_state(message.data.battery_is_charging);
+>>>>>>> fec752331 (upd wplugins)
         } else if(message.type == BtMessageTypePinCodeShow) {
             // Display PIN code
             bt_pin_code_show(bt, message.data.pin_code);

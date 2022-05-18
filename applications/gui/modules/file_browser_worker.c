@@ -1,6 +1,11 @@
 #include "file_browser_worker.h"
+<<<<<<< HEAD
 #include <core/check.h>
 #include <core/common_defines.h>
+=======
+#include "furi/check.h"
+#include "furi/common_defines.h"
+>>>>>>> fec752331 (upd wplugins)
 #include "m-string.h"
 #include "storage/filesystem_api_defines.h"
 #include <m-array.h>
@@ -8,12 +13,19 @@
 #include <storage/storage.h>
 #include <furi.h>
 #include <stddef.h>
+<<<<<<< HEAD
 #include "toolbox/path.h"
+=======
+>>>>>>> fec752331 (upd wplugins)
 
 #define TAG "BrowserWorker"
 
 #define ASSETS_DIR "assets"
+<<<<<<< HEAD
 #define BROWSER_ROOT STORAGE_ANY_PATH_PREFIX
+=======
+#define BROWSER_ROOT "/any"
+>>>>>>> fec752331 (upd wplugins)
 #define FILE_NAME_LEN_MAX 256
 #define LONG_LOAD_THRESHOLD 100
 
@@ -22,6 +34,7 @@ typedef enum {
     WorkerEvtLoad = (1 << 1),
     WorkerEvtFolderEnter = (1 << 2),
     WorkerEvtFolderExit = (1 << 3),
+<<<<<<< HEAD
     WorkerEvtFolderRefresh = (1 << 4),
     WorkerEvtConfigChange = (1 << 5),
 } WorkerEvtFlags;
@@ -29,6 +42,12 @@ typedef enum {
 #define WORKER_FLAGS_ALL                                                          \
     (WorkerEvtStop | WorkerEvtLoad | WorkerEvtFolderEnter | WorkerEvtFolderExit | \
      WorkerEvtFolderRefresh | WorkerEvtConfigChange)
+=======
+} WorkerEvtFlags;
+
+#define WORKER_FLAGS_ALL \
+    (WorkerEvtStop | WorkerEvtLoad | WorkerEvtFolderEnter | WorkerEvtFolderExit)
+>>>>>>> fec752331 (upd wplugins)
 
 ARRAY_DEF(idx_last_array, int32_t)
 
@@ -53,13 +72,21 @@ struct BrowserWorker {
 static bool browser_path_is_file(string_t path) {
     bool state = false;
     FileInfo file_info;
+<<<<<<< HEAD
     Storage* storage = furi_record_open(RECORD_STORAGE);
+=======
+    Storage* storage = furi_record_open("storage");
+>>>>>>> fec752331 (upd wplugins)
     if(storage_common_stat(storage, string_get_cstr(path), &file_info) == FSE_OK) {
         if((file_info.flags & FSF_DIRECTORY) == 0) {
             state = true;
         }
     }
+<<<<<<< HEAD
     furi_record_close(RECORD_STORAGE);
+=======
+    furi_record_close("storage");
+>>>>>>> fec752331 (upd wplugins)
     return state;
 }
 
@@ -97,7 +124,11 @@ static bool browser_filter_by_name(BrowserWorker* browser, string_t name, bool i
 
 static bool browser_folder_check_and_switch(string_t path) {
     FileInfo file_info;
+<<<<<<< HEAD
     Storage* storage = furi_record_open(RECORD_STORAGE);
+=======
+    Storage* storage = furi_record_open("storage");
+>>>>>>> fec752331 (upd wplugins)
     bool is_root = false;
     while(1) {
         // Check if folder is existing and navigate back if not
@@ -111,7 +142,11 @@ static bool browser_folder_check_and_switch(string_t path) {
         }
         is_root = browser_path_trim(path);
     }
+<<<<<<< HEAD
     furi_record_close(RECORD_STORAGE);
+=======
+    furi_record_close("storage");
+>>>>>>> fec752331 (upd wplugins)
     return is_root;
 }
 
@@ -125,7 +160,11 @@ static bool browser_folder_init(
     FileInfo file_info;
     uint32_t total_files_cnt = 0;
 
+<<<<<<< HEAD
     Storage* storage = furi_record_open(RECORD_STORAGE);
+=======
+    Storage* storage = furi_record_open("storage");
+>>>>>>> fec752331 (upd wplugins)
     File* directory = storage_file_alloc(storage);
 
     char name_temp[FILE_NAME_LEN_MAX];
@@ -153,7 +192,10 @@ static bool browser_folder_init(
                     (*item_cnt)++;
                 }
                 if(total_files_cnt == LONG_LOAD_THRESHOLD) {
+<<<<<<< HEAD
                     // There are too many files in folder and counting them will take some time - send callback to app
+=======
+>>>>>>> fec752331 (upd wplugins)
                     if(browser->long_load_cb) {
                         browser->long_load_cb(browser->cb_ctx);
                     }
@@ -167,7 +209,11 @@ static bool browser_folder_init(
     storage_dir_close(directory);
     storage_file_free(directory);
 
+<<<<<<< HEAD
     furi_record_close(RECORD_STORAGE);
+=======
+    furi_record_close("storage");
+>>>>>>> fec752331 (upd wplugins)
 
     return state;
 }
@@ -176,7 +222,11 @@ static bool
     browser_folder_load(BrowserWorker* browser, string_t path, uint32_t offset, uint32_t count) {
     FileInfo file_info;
 
+<<<<<<< HEAD
     Storage* storage = furi_record_open(RECORD_STORAGE);
+=======
+    Storage* storage = furi_record_open("storage");
+>>>>>>> fec752331 (upd wplugins)
     File* directory = storage_file_alloc(storage);
 
     char name_temp[FILE_NAME_LEN_MAX];
@@ -241,7 +291,11 @@ static bool
     storage_dir_close(directory);
     storage_file_free(directory);
 
+<<<<<<< HEAD
     furi_record_close(RECORD_STORAGE);
+=======
+    furi_record_close("storage");
+>>>>>>> fec752331 (upd wplugins)
 
     return (items_cnt == count);
 }
@@ -256,6 +310,7 @@ static int32_t browser_worker(void* context) {
     string_init_set_str(path, BROWSER_ROOT);
     browser->item_sel_idx = -1;
 
+<<<<<<< HEAD
     string_t filename;
     string_init(filename);
 
@@ -275,6 +330,20 @@ static int32_t browser_worker(void* context) {
 
             furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtFolderEnter);
         }
+=======
+    // If start path is a path to the file - try finding index of this file in a folder
+    string_t filename;
+    string_init(filename);
+    if(browser_path_is_file(browser->path_next)) {
+        file_browser_worker_get_filename(browser->path_next, filename, false);
+    }
+
+    osThreadFlagsSet(furi_thread_get_thread_id(browser->thread), WorkerEvtFolderEnter);
+
+    while(1) {
+        uint32_t flags = osThreadFlagsWait(WORKER_FLAGS_ALL, osFlagsWaitAny, osWaitForever);
+        furi_assert((flags & osFlagsError) == 0);
+>>>>>>> fec752331 (upd wplugins)
 
         if(flags & WorkerEvtFolderEnter) {
             string_set(path, browser->path_next);
@@ -314,6 +383,7 @@ static int32_t browser_worker(void* context) {
             }
         }
 
+<<<<<<< HEAD
         if(flags & WorkerEvtFolderRefresh) {
             bool is_root = browser_folder_check_and_switch(path);
 
@@ -331,6 +401,8 @@ static int32_t browser_worker(void* context) {
             }
         }
 
+=======
+>>>>>>> fec752331 (upd wplugins)
         if(flags & WorkerEvtLoad) {
             FURI_LOG_D(TAG, "Load offset: %u cnt: %u", browser->load_offset, browser->load_count);
             browser_folder_load(browser, path, browser->load_offset, browser->load_count);
@@ -348,7 +420,25 @@ static int32_t browser_worker(void* context) {
     return 0;
 }
 
+<<<<<<< HEAD
 BrowserWorker* file_browser_worker_alloc(string_t path, const char* filter_ext, bool skip_assets) {
+=======
+void file_browser_worker_get_filename(string_t path, string_t name, bool trim_ext) {
+    size_t filename_start = string_search_rchar(path, '/');
+    if(filename_start > 0) {
+        filename_start++;
+        string_set_n(name, path, filename_start, string_size(path) - filename_start);
+    }
+    if(trim_ext) {
+        size_t dot = string_search_rchar(name, '.');
+        if(dot > 0) {
+            string_left(name, dot);
+        }
+    }
+}
+
+BrowserWorker* file_browser_worker_alloc(string_t path, char* filter_ext, bool skip_assets) {
+>>>>>>> fec752331 (upd wplugins)
     BrowserWorker* browser = malloc(sizeof(BrowserWorker));
 
     idx_last_array_init(browser->idx_last);
@@ -370,7 +460,11 @@ BrowserWorker* file_browser_worker_alloc(string_t path, const char* filter_ext, 
 void file_browser_worker_free(BrowserWorker* browser) {
     furi_assert(browser);
 
+<<<<<<< HEAD
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtStop);
+=======
+    osThreadFlagsSet(furi_thread_get_thread_id(browser->thread), WorkerEvtStop);
+>>>>>>> fec752331 (upd wplugins)
     furi_thread_join(browser->thread);
     furi_thread_free(browser->thread);
 
@@ -415,6 +509,7 @@ void file_browser_worker_set_long_load_callback(
     browser->long_load_cb = cb;
 }
 
+<<<<<<< HEAD
 void file_browser_worker_set_config(
     BrowserWorker* browser,
     string_t path,
@@ -427,15 +522,22 @@ void file_browser_worker_set_config(
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtConfigChange);
 }
 
+=======
+>>>>>>> fec752331 (upd wplugins)
 void file_browser_worker_folder_enter(BrowserWorker* browser, string_t path, int32_t item_idx) {
     furi_assert(browser);
     string_set(browser->path_next, path);
     browser->item_sel_idx = item_idx;
+<<<<<<< HEAD
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtFolderEnter);
+=======
+    osThreadFlagsSet(furi_thread_get_thread_id(browser->thread), WorkerEvtFolderEnter);
+>>>>>>> fec752331 (upd wplugins)
 }
 
 void file_browser_worker_folder_exit(BrowserWorker* browser) {
     furi_assert(browser);
+<<<<<<< HEAD
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtFolderExit);
 }
 
@@ -443,11 +545,18 @@ void file_browser_worker_folder_refresh(BrowserWorker* browser, int32_t item_idx
     furi_assert(browser);
     browser->item_sel_idx = item_idx;
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtFolderRefresh);
+=======
+    osThreadFlagsSet(furi_thread_get_thread_id(browser->thread), WorkerEvtFolderExit);
+>>>>>>> fec752331 (upd wplugins)
 }
 
 void file_browser_worker_load(BrowserWorker* browser, uint32_t offset, uint32_t count) {
     furi_assert(browser);
     browser->load_offset = offset;
     browser->load_count = count;
+<<<<<<< HEAD
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtLoad);
+=======
+    osThreadFlagsSet(furi_thread_get_thread_id(browser->thread), WorkerEvtLoad);
+>>>>>>> fec752331 (upd wplugins)
 }

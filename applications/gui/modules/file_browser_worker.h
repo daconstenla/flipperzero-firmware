@@ -22,7 +22,13 @@ typedef void (*BrowserWorkerListItemCallback)(
     bool is_last);
 typedef void (*BrowserWorkerLongLoadCallback)(void* context);
 
+<<<<<<< HEAD
 BrowserWorker* file_browser_worker_alloc(string_t path, const char* filter_ext, bool skip_assets);
+=======
+void file_browser_worker_get_filename(string_t path, string_t name, bool trim_ext);
+
+BrowserWorker* file_browser_worker_alloc(string_t path, char* filter_ext, bool skip_assets);
+>>>>>>> fec752331 (upd wplugins)
 
 void file_browser_worker_free(BrowserWorker* browser);
 
@@ -44,18 +50,24 @@ void file_browser_worker_set_long_load_callback(
     BrowserWorker* browser,
     BrowserWorkerLongLoadCallback cb);
 
+<<<<<<< HEAD
 void file_browser_worker_set_config(
     BrowserWorker* browser,
     string_t path,
     const char* filter_ext,
     bool skip_assets);
 
+=======
+>>>>>>> fec752331 (upd wplugins)
 void file_browser_worker_folder_enter(BrowserWorker* browser, string_t path, int32_t item_idx);
 
 void file_browser_worker_folder_exit(BrowserWorker* browser);
 
+<<<<<<< HEAD
 void file_browser_worker_folder_refresh(BrowserWorker* browser, int32_t item_idx);
 
+=======
+>>>>>>> fec752331 (upd wplugins)
 void file_browser_worker_load(BrowserWorker* browser, uint32_t offset, uint32_t count);
 
 #ifdef __cplusplus

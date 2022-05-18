@@ -1,15 +1,26 @@
 #include "file_browser.h"
 #include "assets_icons.h"
+<<<<<<< HEAD
 #include "file_browser_worker.h"
 #include <core/check.h>
 #include <core/common_defines.h>
 #include <core/log.h>
+=======
+#include "cmsis_os2.h"
+#include "file_browser_worker.h"
+#include "furi/check.h"
+#include "furi/common_defines.h"
+#include "furi/log.h"
+>>>>>>> fec752331 (upd wplugins)
 #include "furi_hal_resources.h"
 #include "m-string.h"
 #include <m-array.h>
 #include <gui/elements.h>
 #include <furi.h>
+<<<<<<< HEAD
 #include "toolbox/path.h"
+=======
+>>>>>>> fec752331 (upd wplugins)
 
 #define LIST_ITEMS 5u
 #define MAX_LEN_PX 110
@@ -60,13 +71,21 @@ ARRAY_DEF(
 struct FileBrowser {
     View* view;
     BrowserWorker* worker;
+<<<<<<< HEAD
     const char* ext_filter;
+=======
+    char* ext_filter;
+>>>>>>> fec752331 (upd wplugins)
     bool skip_assets;
 
     FileBrowserCallback callback;
     void* context;
 
+<<<<<<< HEAD
     string_ptr result_path;
+=======
+    string_t* result_path;
+>>>>>>> fec752331 (upd wplugins)
 };
 
 typedef struct {
@@ -100,7 +119,11 @@ static void browser_list_load_cb(void* context, uint32_t list_load_offset);
 static void browser_list_item_cb(void* context, string_t item_path, bool is_folder, bool is_last);
 static void browser_long_load_cb(void* context);
 
+<<<<<<< HEAD
 FileBrowser* file_browser_alloc(string_ptr result_path) {
+=======
+FileBrowser* file_browser_alloc(string_t* result_path) {
+>>>>>>> fec752331 (upd wplugins)
     furi_assert(result_path);
     FileBrowser* browser = malloc(sizeof(FileBrowser));
     browser->view = view_alloc();
@@ -140,7 +163,11 @@ View* file_browser_get_view(FileBrowser* browser) {
 
 void file_browser_configure(
     FileBrowser* browser,
+<<<<<<< HEAD
     const char* extension,
+=======
+    char* extension,
+>>>>>>> fec752331 (upd wplugins)
     bool skip_assets,
     const Icon* file_icon,
     bool hide_ext) {
@@ -250,7 +277,10 @@ static void
 
     with_view_model(
         browser->view, (FileBrowserModel * model) {
+<<<<<<< HEAD
             items_array_reset(model->items);
+=======
+>>>>>>> fec752331 (upd wplugins)
             if(is_root) {
                 model->item_cnt = item_cnt;
                 model->item_idx = (file_idx > 0) ? file_idx : 0;
@@ -353,12 +383,28 @@ static void browser_draw_frame(Canvas* canvas, uint16_t idx, bool scrollbar) {
 }
 
 static void browser_draw_loading(Canvas* canvas, FileBrowserModel* model) {
+<<<<<<< HEAD
     UNUSED(model);
 
     uint8_t x = 128 / 2 - 24 / 2;
     uint8_t y = 64 / 2 - 24 / 2;
 
     canvas_draw_icon(canvas, x, y, &A_Loading_24);
+=======
+    uint8_t width = 49;
+    uint8_t height = 47;
+    uint8_t x = 128 / 2 - width / 2;
+    uint8_t y = 64 / 2 - height / 2;
+
+    UNUSED(model);
+
+    elements_bold_rounded_frame(canvas, x, y, width, height);
+
+    canvas_set_font(canvas, FontSecondary);
+    elements_multiline_text(canvas, x + 7, y + 13, "Loading...");
+
+    canvas_draw_icon(canvas, x + 13, y + 19, &A_Loading_24);
+>>>>>>> fec752331 (upd wplugins)
 }
 
 static void browser_draw_list(Canvas* canvas, FileBrowserModel* model) {
@@ -377,7 +423,11 @@ static void browser_draw_list(Canvas* canvas, FileBrowserModel* model) {
             BrowserItem_t* item = items_array_get(
                 model->items, CLAMP(idx - model->array_offset, (int32_t)(array_size - 1), 0));
             item_type = item->type;
+<<<<<<< HEAD
             path_extract_filename(
+=======
+            file_browser_worker_get_filename(
+>>>>>>> fec752331 (upd wplugins)
                 item->path, filename, (model->hide_ext) && (item_type == BrowserItemTypeFile));
         } else {
             string_set_str(filename, "---");
@@ -499,9 +549,15 @@ static bool file_browser_view_input_callback(InputEvent* event, void* context) {
                     file_browser_worker_folder_enter(
                         browser->worker, selected_item->path, select_index);
                 } else if(selected_item->type == BrowserItemTypeFile) {
+<<<<<<< HEAD
                     string_set(browser->result_path, selected_item->path);
                     if(browser->callback) {
                         browser->callback(browser->context);
+=======
+                    string_set(*(browser->result_path), selected_item->path);
+                    if(browser->callback) {
+                        browser->callback(browser->context, true);
+>>>>>>> fec752331 (upd wplugins)
                     }
                 }
             }

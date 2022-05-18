@@ -13,9 +13,15 @@ extern "C" {
 #endif
 
 typedef struct FileBrowser FileBrowser;
+<<<<<<< HEAD
 typedef void (*FileBrowserCallback)(void* context);
 
 FileBrowser* file_browser_alloc(string_ptr result_path);
+=======
+typedef void (*FileBrowserCallback)(void* context, bool state);
+
+FileBrowser* file_browser_alloc(string_t* result_path);
+>>>>>>> fec752331 (upd wplugins)
 
 void file_browser_free(FileBrowser* browser);
 
@@ -23,7 +29,11 @@ View* file_browser_get_view(FileBrowser* browser);
 
 void file_browser_configure(
     FileBrowser* browser,
+<<<<<<< HEAD
     const char* extension,
+=======
+    char* extension,
+>>>>>>> fec752331 (upd wplugins)
     bool skip_assets,
     const Icon* file_icon,
     bool hide_ext);

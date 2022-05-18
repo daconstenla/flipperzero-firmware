@@ -1,8 +1,13 @@
 #include "../file_browser_app_i.h"
+<<<<<<< HEAD
 
 #include <furi_hal.h>
 #include <gui/modules/widget_elements/widget_element_i.h>
 #include <storage/storage.h>
+=======
+#include "furi_hal.h"
+#include "gui/modules/widget_elements/widget_element_i.h"
+>>>>>>> fec752331 (upd wplugins)
 
 static void
     file_browser_scene_start_ok_callback(GuiButtonType result, InputType type, void* context) {
@@ -19,7 +24,11 @@ bool file_browser_scene_start_on_event(void* context, SceneManagerEvent event) {
     bool consumed = false;
 
     if(event.type == SceneManagerEventTypeCustom) {
+<<<<<<< HEAD
         string_set_str(app->file_path, ANY_PATH("badusb/demo_windows.txt"));
+=======
+        string_set_str(app->file_path, "/any/badusb/demo_windows.txt");
+>>>>>>> fec752331 (upd wplugins)
         scene_manager_next_scene(app->scene_manager, FileBrowserSceneBrowser);
         consumed = true;
     } else if(event.type == SceneManagerEventTypeTick) {
