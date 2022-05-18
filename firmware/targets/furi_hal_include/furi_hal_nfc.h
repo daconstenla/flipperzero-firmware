@@ -92,10 +92,13 @@ typedef struct {
     uint16_t rx_bits;
     FuriHalNfcTxRxType tx_rx_type;
     NfcaSignal* nfca_signal;
+<<<<<<< HEAD
 
     FuriHalNfcTxRxSniffCallback sniff_tx;
     FuriHalNfcTxRxSniffCallback sniff_rx;
     void* sniff_context;
+=======
+>>>>>>> 4760c1c5c (fetch wplugins)
 } FuriHalNfcTxRxContext;
 
 /** Init nfc
