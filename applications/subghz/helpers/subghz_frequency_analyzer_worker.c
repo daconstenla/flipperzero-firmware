@@ -7,8 +7,6 @@
 
 #define SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD -95.0f
 
-#define SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD -90.0f
-
 static const uint8_t subghz_preset_ook_58khz[][2] = {
     {CC1101_MDMCFG4, 0b11110111}, // Rx BW filter is 58.035714kHz
     /* End  */
@@ -37,7 +35,7 @@ struct SubGhzFrequencyAnalyzerWorker {
 
 static void subghz_frequency_analyzer_worker_load_registers(const uint8_t data[][2]) {
     furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
-    uint32_t i = 0;
+    size_t i = 0;
     while(data[i][0]) {
         cc1101_write_reg(&furi_hal_spi_bus_handle_subghz, data[i][0], data[i][1]);
         i++;
@@ -62,24 +60,17 @@ static uint32_t subghz_frequency_analyzer_worker_expRunningAverageAdaptive(
 }
 
 /** Worker thread
- *
- * @param context
- * @return exit code
+ * 
+ * @param context 
+ * @return exit code 
  */
 static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
     SubGhzFrequencyAnalyzerWorker* instance = context;
 
-<<<<<<< HEAD
     FrequencyRSSI frequency_rssi = {
         .frequency_coarse = 0, .rssi_coarse = 0, .frequency_fine = 0, .rssi_fine = 0};
     float rssi = 0;
     uint32_t frequency = 0;
-=======
-    FrequencyRSSI frequency_rssi = {.frequency = 0, .rssi = 0};
-    float rssi;
-    uint32_t frequency;
-    uint32_t frequency_start;
->>>>>>> fec752331 (upd wplugins)
     CC1101Status status;
 
     //Start CC1101
@@ -89,7 +80,6 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
     cc1101_flush_rx(&furi_hal_spi_bus_handle_subghz);
     cc1101_flush_tx(&furi_hal_spi_bus_handle_subghz);
     cc1101_write_reg(&furi_hal_spi_bus_handle_subghz, CC1101_IOCFG0, CC1101IocfgHW);
-<<<<<<< HEAD
     cc1101_write_reg(&furi_hal_spi_bus_handle_subghz, CC1101_MDMCFG3,
                      0b01111111); // symbol rate
     cc1101_write_reg(
@@ -104,20 +94,6 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
         &furi_hal_spi_bus_handle_subghz,
         CC1101_AGCCTRL0,
         0b00110000); // 00 - No hysteresis, medium asymmetric dead zone, medium gain ; 11 - 64 samples agc; 00 - Normal AGC, 00 - 4dB boundary
-=======
-    cc1101_write_reg(
-        &furi_hal_spi_bus_handle_subghz,
-        CC1101_AGCCTRL2,
-        0b0000111); // 00 - DVGA all; 000 - MAX LNA+LNA2; 111 - MAIN_TARGET 42 dB
-    cc1101_write_reg(
-        &furi_hal_spi_bus_handle_subghz,
-        CC1101_AGCCTRL1,
-        0b00000000); // 0; 0 - LNA 2 gain is decreased to minimum before decreasing LNA gain; 00 - Relative carrier sense threshold disabled; 0000 - RSSI to MAIN_TARGET
-    cc1101_write_reg(
-        &furi_hal_spi_bus_handle_subghz,
-        CC1101_AGCCTRL0,
-        0b00000001); // 00 - No hysteresis, medium asymmetric dead zone, medium gain ; 00 - 8 samples agc; 00 - Normal AGC, 01 - 8dB boundary
->>>>>>> fec752331 (upd wplugins)
 
     furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
 
@@ -135,10 +111,7 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
         furi_hal_subghz_idle();
         subghz_frequency_analyzer_worker_load_registers(subghz_preset_ook_650khz);
 
-<<<<<<< HEAD
         // First stage: coarse scan
-=======
->>>>>>> fec752331 (upd wplugins)
         for(size_t i = 0; i < subghz_setting_get_frequency_count(instance->setting); i++) {
             if(furi_hal_subghz_is_frequency_valid(
                    subghz_setting_get_frequency(instance->setting, i))) {
@@ -156,12 +129,8 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
                 cc1101_switch_to_rx(&furi_hal_spi_bus_handle_subghz);
                 furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
 
-<<<<<<< HEAD
                 furi_delay_ms(2);
 
-=======
-                osDelay(3);
->>>>>>> fec752331 (upd wplugins)
                 rssi = furi_hal_subghz_get_rssi();
 
                 rssi_avg += rssi;
@@ -176,7 +145,6 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
             }
         }
 
-<<<<<<< HEAD
         FURI_LOG_T(
             TAG,
             "RSSI: avg %f, max %f at %u, min %f",
@@ -193,16 +161,6 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
             for(uint32_t i = frequency_rssi.frequency_coarse - 300000;
                 i < frequency_rssi.frequency_coarse + 300000;
                 i += 20000) {
-=======
-        if(frequency_rssi.rssi > SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD) {
-            //  -0.5 ... 433.92 ... +0.5
-            frequency_start = frequency_rssi.frequency - 500000;
-            frequency_rssi.rssi = -127.0;
-            furi_hal_subghz_idle();
-            subghz_frequency_analyzer_worker_load_registers(subghz_preset_ook_58khz);
-            //step 10KHz
-            for(uint32_t i = frequency_start; i < frequency_start + 500000; i += 10000) {
->>>>>>> fec752331 (upd wplugins)
                 if(furi_hal_subghz_is_frequency_valid(i)) {
                     furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
                     cc1101_switch_to_idle(&furi_hal_spi_bus_handle_subghz);
@@ -216,12 +174,8 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
                     cc1101_switch_to_rx(&furi_hal_spi_bus_handle_subghz);
                     furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
 
-<<<<<<< HEAD
                     furi_delay_ms(2);
 
-=======
-                    osDelay(5);
->>>>>>> fec752331 (upd wplugins)
                     rssi = furi_hal_subghz_get_rssi();
 
                     FURI_LOG_T(TAG, "#:%u:%f", frequency, (double)rssi);
@@ -234,17 +188,12 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
             }
         }
 
-<<<<<<< HEAD
         // Deliver results fine
         if(frequency_rssi.rssi_fine > SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD) {
             FURI_LOG_D(
                 TAG, "=:%u:%f", frequency_rssi.frequency_fine, (double)frequency_rssi.rssi_fine);
 
             instance->sample_hold_counter = 20;
-=======
-        if(frequency_rssi.rssi > SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD) {
-            instance->count_repet = 20;
->>>>>>> fec752331 (upd wplugins)
             if(instance->filVal) {
                 frequency_rssi.frequency_fine =
                     subghz_frequency_analyzer_worker_expRunningAverageAdaptive(
