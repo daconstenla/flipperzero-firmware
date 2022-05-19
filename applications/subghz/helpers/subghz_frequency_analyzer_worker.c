@@ -7,10 +7,6 @@
 
 #define SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD -95.0f
 
-#define TAG "SubghzFrequencyAnalyzerWorker"
-
-#define SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD -95.0f
-
 static const uint8_t subghz_preset_ook_58khz[][2] = {
     {CC1101_MDMCFG4, 0b11110111}, // Rx BW filter is 58.035714kHz
     /* End  */
@@ -64,9 +60,9 @@ static uint32_t subghz_frequency_analyzer_worker_expRunningAverageAdaptive(
 }
 
 /** Worker thread
- *
- * @param context
- * @return exit code
+ * 
+ * @param context 
+ * @return exit code 
  */
 static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
     SubGhzFrequencyAnalyzerWorker* instance = context;
