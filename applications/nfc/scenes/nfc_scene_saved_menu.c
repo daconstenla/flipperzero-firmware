@@ -40,7 +40,11 @@ void nfc_scene_saved_menu_on_enter(void* context) {
         nfc->dev->format == NfcDeviceSaveFormatMifareUl ||
         nfc->dev->format == NfcDeviceSaveFormatMifareClassic) {
         submenu_add_item(
-            submenu, "Emulate", SubmenuIndexEmulate, nfc_scene_saved_menu_submenu_callback, nfc);
+            submenu,
+            "Emulate Ultralight",
+            SubmenuIndexEmulate,
+            nfc_scene_saved_menu_submenu_callback,
+            nfc);
     }
     submenu_add_item(
         submenu, "Info", SubmenuIndexInfo, nfc_scene_saved_menu_submenu_callback, nfc);
@@ -70,9 +74,9 @@ bool nfc_scene_saved_menu_on_event(void* context, SceneManagerEvent event) {
         scene_manager_set_scene_state(nfc->scene_manager, NfcSceneSavedMenu, event.event);
         if(event.event == SubmenuIndexEmulate) {
             if(nfc->dev->format == NfcDeviceSaveFormatMifareUl) {
-                scene_manager_next_scene(nfc->scene_manager, NfcSceneMfUltralightEmulate);
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneEmulateMifareUl);
             } else if(nfc->dev->format == NfcDeviceSaveFormatMifareClassic) {
-                scene_manager_next_scene(nfc->scene_manager, NfcSceneMfClassicEmulate);
+                scene_manager_next_scene(nfc->scene_manager, NfcSceneEmulateMifareClassic);
             } else {
                 scene_manager_next_scene(nfc->scene_manager, NfcSceneEmulateUid);
             }
@@ -100,6 +104,6 @@ bool nfc_scene_saved_menu_on_event(void* context, SceneManagerEvent event) {
 
 void nfc_scene_saved_menu_on_exit(void* context) {
     Nfc* nfc = context;
-
+//
     submenu_reset(nfc->submenu);
 }

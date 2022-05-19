@@ -1,7 +1,6 @@
 #include "nfca.h"
 #include <string.h>
 #include <stdio.h>
-#include <furi.h>
 
 #define NFCA_CMD_RATS (0xE0U)
 
@@ -62,6 +61,7 @@ bool nfca_emulation_handler(
 
     return sleep;
 }
+<<<<<<< HEAD:lib/nfc/protocols/nfca.c
 
 static void nfca_add_bit(DigitalSignal* signal, bool bit) {
     if(bit) {
@@ -140,3 +140,5 @@ void nfca_signal_encode(NfcaSignal* nfca_signal, uint8_t* data, uint16_t bits, u
         }
     }
 }
+=======
+>>>>>>> 970833636 (Revert "fetch wplugins"):lib/nfc_protocols/nfca.c
