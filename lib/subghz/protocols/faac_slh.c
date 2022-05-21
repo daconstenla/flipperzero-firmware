@@ -259,7 +259,8 @@ bool subghz_protocol_encoder_faac_slh_deserialize(void* context, FlipperFormat* 
             FURI_LOG_E(TAG, "Missing Seed");
             break;
         }
-
+        instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 |
+                                 seed_data[3];
         instance->encoder.is_runing = true;
 
         res = true;
@@ -443,6 +444,8 @@ bool subghz_protocol_decoder_faac_slh_serialize(
         FURI_LOG_E(TAG, "Unable to add Seed");
         res = false;
     }
+    instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 |
+                                 seed_data[3];
     return res;
 }
 
