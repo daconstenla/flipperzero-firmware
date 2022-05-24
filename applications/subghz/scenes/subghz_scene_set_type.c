@@ -76,6 +76,12 @@ void subghz_scene_set_type_on_enter(void* context) {
         subghz);
     submenu_add_item(
         subghz->submenu,
+        "BFT Mitto",
+        SubmenuIndexBFT,
+        subghz_scene_set_type_submenu_callback,
+        subghz);
+    submenu_add_item(
+        subghz->submenu,
         "Princeton_433",
         SubmenuIndexPricenton,
         subghz_scene_set_type_submenu_callback,
@@ -185,6 +191,9 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
         switch(event.event) {
         case SubmenuIndexFaacSLH:
             scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetFix);
+            break;
+        case SubmenuIndexBFT:
+            scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetFixBft);
             break;
         case SubmenuIndexPricenton:
             key = (key & 0x00FFFFF0) | 0x4; //btn 0x1, 0x2, 0x4, 0x8
