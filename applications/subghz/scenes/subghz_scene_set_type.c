@@ -3,6 +3,7 @@
 #include <lib/subghz/protocols/secplus_v1.h>
 #include <lib/subghz/protocols/secplus_v2.h>
 #include <lib/subghz/protocols/faac_slh.h>
+#include <lib/subghz/protocols/secplus_v1.h>
 #include <lib/subghz/blocks/math.h>
 #include <dolphin/dolphin.h>
 #include <flipper_format/flipper_format_i.h>

@@ -85,7 +85,7 @@ const SubGhzProtocol subghz_protocol_secplus_v1 = {
     .name = SUBGHZ_PROTOCOL_SECPLUS_V1_NAME,
     .type = SubGhzProtocolTypeDynamic,
     .flag = SubGhzProtocolFlag_315 | SubGhzProtocolFlag_AM | SubGhzProtocolFlag_Decodable |
-            SubGhzProtocolFlag_Load | SubGhzProtocolFlag_Send,
+            SubGhzProtocolFlag_Load | SubGhzProtocolFlag_Send | SubGhzProtocolFlag_Save,
 
     .decoder = &subghz_protocol_secplus_v1_decoder,
     .encoder = &subghz_protocol_secplus_v1_encoder,
@@ -204,9 +204,9 @@ static bool
     return true;
 }
 
-/** 
+/**
  * Security+ 1.0 message encoding
- * @param instance SubGhzProtocolEncoderSecPlus_v1* 
+ * @param instance SubGhzProtocolEncoderSecPlus_v1*
  */
 
 static bool subghz_protocol_secplus_v1_encode(SubGhzProtocolEncoderSecPlus_v1* instance) {
@@ -350,9 +350,9 @@ void subghz_protocol_decoder_secplus_v1_reset(void* context) {
     // does not reset the decoder because you need to get 2 parts of the package
 }
 
-/** 
+/**
  * Security+ 1.0 message decoding
- * @param instance SubGhzProtocolDecoderSecPlus_v1* 
+ * @param instance SubGhzProtocolDecoderSecPlus_v1*
  */
 
 static void subghz_protocol_secplus_v1_decode(SubGhzProtocolDecoderSecPlus_v1* instance) {
@@ -549,6 +549,18 @@ bool subghz_protocol_secplus_v1_check_fixed(uint32_t fixed) {
     uint8_t btn = fixed % 3;
 
     do {
+        if(id1 == 0) return false;
+        if(!(btn == 0 || btn == 1 || btn == 2)) return false;
+    } while(false);
+    return true;
+}
+
+bool subghz_protocol_secplus_v1_check_fixed (uint32_t fixed) {
+    //uint8_t id0 = (fixed / 3) % 3;
+    uint8_t id1 = (fixed / 9) % 3;
+    uint8_t btn = fixed % 3;
+
+    do{
         if(id1 == 0) return false;
         if(!(btn == 0 || btn == 1 || btn == 2)) return false;
     } while(false);
