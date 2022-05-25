@@ -9,9 +9,9 @@ Our goal is to make any features possible in this device without any stupid limi
 
 # Clone the Repository
 
-You should clone with 
+You should clone with
 ```shell
-$ git clone --recursive https://github.com/flipperdevices/flipperzero-firmware.git
+$ git clone --recursive https://github.com/Eng1n33r/flipperzero-firmware.git
 ```
 
 # Update firmware
@@ -35,7 +35,7 @@ Just building the package:
 
 `./fbt updater_package`
 
-To update, copy the resulting directory to Flipper's SD card and navigate to `update.fuf` file in Archive app. 
+To update, copy the resulting directory to Flipper's SD card and navigate to `update.fuf` file in Archive app.
 
 ## With STLink
 
@@ -50,12 +50,12 @@ Prerequisites:
 
 One liner: `./fbt firmware_flash`
 
-## With USB DFU 
+## With USB DFU
 
 1. Download latest [Firmware](https://update.flipperzero.one)
 
 2. Reboot Flipper to Bootloader
- - Press and hold `← Left` + `↩ Back` for reset 
+ - Press and hold `← Left` + `↩ Back` for reset
  - Release `↩ Back` and keep holding `← Left` until blue LED lights up
  - Release `← Left`
 
@@ -86,7 +86,7 @@ If compilation fails, make sure all submodules are all initialized. Either clone
 
 # Build on Linux/macOS
 
-Check out `documentation/fbt.md` for details on building and flashing firmware. 
+Check out `documentation/fbt.md` for details on building and flashing firmware.
 
 ## macOS Prerequisites
 
