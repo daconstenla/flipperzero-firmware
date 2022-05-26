@@ -1,9 +1,8 @@
 #include "../subghz_i.h"
 #include <lib/subghz/protocols/keeloq.h>
-#include <lib/subghz/protocols/secplus_v1.h>
-#include <lib/subghz/protocols/secplus_v2.h>
 #include <lib/subghz/protocols/faac_slh.h>
 #include <lib/subghz/protocols/secplus_v1.h>
+#include <lib/subghz/protocols/secplus_v2.h>
 #include <lib/subghz/blocks/math.h>
 #include <dolphin/dolphin.h>
 #include <flipper_format/flipper_format_i.h>
@@ -392,6 +391,7 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
             }
             subghz_transmitter_free(subghz->txrx->transmitter);
             break;
+
         default:
             return false;
             break;
