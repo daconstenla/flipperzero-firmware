@@ -40,7 +40,7 @@ void subghz_protocol_encoder_secplus_v2_stop(void* context);
 /**
  * Getting the level and duration of the upload to be loaded into DMA.
  * @param context Pointer to a SubGhzProtocolEncoderSecPlus_v2 instance
- * @return LevelDuration 
+ * @return LevelDuration
  */
 LevelDuration subghz_protocol_encoder_secplus_v2_yield(void* context);
 
