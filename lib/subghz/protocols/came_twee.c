@@ -22,7 +22,7 @@
         (dip & 0x0008 ? '1' : '0'), (dip & 0x0004 ? '1' : '0'), (dip & 0x0002 ? '1' : '0'), \
         (dip & 0x0001 ? '1' : '0')
 
-/** 
+/**
  * Rainbow table Came Twee.
  */
 static const uint32_t came_twee_magic_numbers_xor[15] = {
@@ -189,7 +189,7 @@ static void subghz_protocol_encoder_came_twee_get_upload(SubGhzProtocolEncoderCa
     instance->encoder.size_upload = index;
 }
 
-/** 
+/**
  * Analysis of received data
  * @param instance Pointer to a SubGhzBlockGeneric* instance
  */
@@ -197,7 +197,7 @@ static void subghz_protocol_came_twee_remote_controller(SubGhzBlockGeneric* inst
     /*      Came Twee 54 bit, rolling code 15 parcels with
     *       a decreasing counter from 0xE to 0x0
     *       with originally coded dip switches on the console 10 bit code
-    * 
+    *
     *  0x003FFF72E04A6FEE
     *  0x003FFF72D17B5EDD
     *  0x003FFF72C2684DCC
@@ -213,12 +213,12 @@ static void subghz_protocol_came_twee_remote_controller(SubGhzBlockGeneric* inst
     *  0x003FFF722C86A322
     *  0x003FFF721DB79211
     *  0x003FFF720EA48100
-    * 
+    *
     *   decryption
     * the last 32 bits, do XOR by the desired number, divide the result by 4,
     * convert the first 16 bits of the resulting 32-bit number to bin and do
     * bit-by-bit mirroring, adding up to 10 bits
-    * 
+    *
     * Example
     * Step 1. 0x003FFF721DB79211        => 0x1DB79211
     * Step 4. 0x1DB79211 xor 0x1D1D1D11 => 0x00AA8F00
