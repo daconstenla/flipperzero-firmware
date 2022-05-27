@@ -1,5 +1,4 @@
 #include "bad_usb_app_i.h"
-#include "m-string.h"
 #include <furi.h>
 #include <furi_hal.h>
 #include <storage/storage.h>
@@ -21,6 +20,24 @@ static void bad_usb_app_tick_event_callback(void* context) {
     furi_assert(context);
     BadUsbApp* app = context;
     scene_manager_handle_tick_event(app->scene_manager);
+}
+
+static bool bad_usb_check_assets() {
+    Storage* fs_api = furi_record_open("storage");
+
+    File* dir = storage_file_alloc(fs_api);
+    bool ret = false;
+
+    if(storage_dir_open(dir, BAD_USB_APP_PATH_FOLDER)) {
+        ret = true;
+    }
+
+    storage_dir_close(dir);
+    storage_file_free(dir);
+
+    furi_record_close("storage");
+
+    return ret;
 }
 
 BadUsbApp* bad_usb_app_alloc(char* arg) {
@@ -64,11 +81,13 @@ BadUsbApp* bad_usb_app_alloc(char* arg) {
         app->error = BadUsbAppErrorCloseRpc;
         scene_manager_next_scene(app->scene_manager, BadUsbSceneError);
     } else {
-        if(!string_empty_p(app->file_path)) {
+        if(*app->file_name != '\0') {
             scene_manager_next_scene(app->scene_manager, BadUsbSceneWork);
-        } else {
-            string_set_str(app->file_path, BAD_USB_APP_PATH_FOLDER);
+        } else if(bad_usb_check_assets()) {
             scene_manager_next_scene(app->scene_manager, BadUsbSceneFileSelect);
+        } else {
+            app->error = BadUsbAppErrorNoFiles;
+            scene_manager_next_scene(app->scene_manager, BadUsbSceneError);
         }
     }
 
@@ -94,8 +113,6 @@ void bad_usb_app_free(BadUsbApp* app) {
     furi_record_close(RECORD_GUI);
     furi_record_close(RECORD_NOTIFICATION);
     furi_record_close(RECORD_DIALOGS);
-
-    string_clear(app->file_path);
 
     free(app);
 }
