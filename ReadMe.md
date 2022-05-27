@@ -1,7 +1,5 @@
 # Flipper Zero Unleashed Firmware
 
-<a href="https://ibb.co/5Fgtgmg"><img src="https://i.ibb.co/rsRTRYR/image.png" alt="image" border="0"></a>(https://discord.gg/58D6E8BtTU)
-
 <a href="https://ibb.co/wQ12PVc"><img src="https://i.ibb.co/wQ12PVc/fzCUSTOM.png" alt="fzCUSTOM" border="0"></a>
 
 Welcome to [Flipper Zero](https://flipperzero.one/)'s Custom Firmware repo!
@@ -20,35 +18,33 @@ $ git clone --recursive https://github.com/Eng1n33r/flipperzero-firmware.git
 
 Flipper Zero's firmware consists of two components:
 
-- Core2 firmware set - proprietary components by ST: FUS + radio stack. FUS is flashed at factory and you should never update it.
-- Core1 Firmware - HAL + OS + Drivers + Applications.
-
-They both must be flashed in the order described.
-
-## With offline update package
-
-With Flipper attached over USB:
-
-`./fbt flash_usb`
-
-Just building the package:
-
-`./fbt updater_package`
-
-To update, copy the resulting directory to Flipper's SD card and navigate to `update.fuf` file in Archive app.
-
-## With STLink
+Please help us realize emulation for all dynamic (rolling codes) protocols and brute-force app!
 
 ### Core1 Firmware
+### This software is for experimental purposes only and is not meant for any illegal activity/purposes. <br> We do not condone illegal activity and strongly encourage keeping transmissions to legal/valid uses allowed by law. <br> Also this software is made without any support from Flipper Devices and in no way related to official devs.
+### Please use for experimental purposes only!
 
-Prerequisites:
 
-- Linux / macOS
-- Terminal
-- [arm-gcc-none-eabi](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
-- openocd
+<br>
+<br>
+Our Discord Community:
+<br>
+<a href="https://discord.gg/58D6E8BtTU"><img src="https://discordapp.com/api/guilds/937479784148115456/widget.png?style=banner4" alt="Unofficial Discord Community"></a>
 
-One liner: `./fbt firmware_flash`
+
+# Update firmware
+
+[Get Latest Firmware from GitHub Releases](https://github.com/Eng1n33r/flipperzero-firmware)
+
+- Unpack `flipper-z-f7-update-(CURRENT VERSION).tgz` (or `.zip`) into any free folder on your PC or smartphone
+- You should find folder named `f7-update-(CURRENT VERSION)` that contains files like `update.fuf` `resources.tar` and etc..
+- Remove microSD card from flipper and insert it into PC or smartphone
+- Create new folder `update` on the root of the sdcard and move folder from archive `f7-update-(CURRENT VERSION)` into `update`
+- So it should be like `update/f7-update-(CURRENT VERSION)/update.fuf` and other files, remember iOS default Files app doesnt show all files properly (3 instead of 5), so you need to use another app for unpacking or use PC or Android
+- After all you need to insert microSD card back into flipper, navigate into filebrowser, open this file
+
+`update/f7-update-(CURRENT VERSION)/update.fuf`
+- Update will start, wait for all stages, when flipper is started after update, you can upload any custom [IR libs](https://github.com/logickworkshop/Flipper-IRDB), and other stuff using qFlipper or directly into microSD card
 
 ## With USB DFU
 
@@ -59,11 +55,20 @@ One liner: `./fbt firmware_flash`
  - Release `↩ Back` and keep holding `← Left` until blue LED lights up
  - Release `← Left`
 
-3. Run `dfu-util -D full.dfu -a 0`
+3. Run `dfu-util -D flipper-z-f7-full-(CURRENT VERSION).dfu -a 0`
 
-# Build with Docker
+# How to Build by yourself:
 
-## Prerequisites
+## Clone the Repository
+
+You should clone with
+```shell
+$ git clone --recursive https://github.com/Eng1n33r/flipperzero-firmware.git
+```
+
+## Build with Docker
+
+### Prerequisites
 
 1. Install [Docker Engine and Docker Compose](https://www.docker.com/get-started)
 2. Prepare the container:
@@ -72,7 +77,7 @@ One liner: `./fbt firmware_flash`
  docker-compose up -d
  ```
 
-## Compile everything
+### Compile everything for development
 
 ```sh
 docker-compose exec dev ./fbt
@@ -100,44 +105,22 @@ brew bundle --verbose
 ### gcc-arm-none-eabi
 
 ```sh
-toolchain="gcc-arm-none-eabi-10.3-2021.10"
-toolchain_package="$toolchain-$(uname -m)-linux"
-
-wget -P /opt "https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/$toolchain_package.tar.bz2"
-
-tar xjf /opt/$toolchain_package.tar.bz2 -C /opt
-rm /opt/$toolchain_package.tar.bz2
-
-for file in /opt/$toolchain/bin/* ; do ln -s "${file}" "/usr/bin/$(basename ${file})" ; done
-```
-
-### Optional dependencies
-
-- openocd (debugging/flashing over SWD)
-- heatshrink (compiling image assets)
-- clang-format (code formatting)
-- dfu-util (flashing over USB DFU)
-- protobuf (compiling proto sources)
-
-For example, to install them on Debian, use:
-```sh
-apt update
-apt install openocd clang-format-13 dfu-util protobuf-compiler
-```
-
-heatshrink has to be compiled [from sources](https://github.com/atomicobject/heatshrink).
-
-## Compile everything
-
-```sh
-./fbt
+docker-compose exec dev make updater_package TARGET=f7 DEBUG=0 COMPACT=1
 ```
 
 Check `dist/` for build outputs.
 
 Use **`flipper-z-{target}-full-{suffix}.dfu`** to flash your device.
 
-## Flash everything
+If compilation fails, make sure all submodules are all initialized. Either clone with `--recursive` or use `git submodule update --init --recursive`.
+
+### Flash everything with qFlipper
+
+Connect your device and select `Update from file`
+then select **`flipper-z-{target}-full-{suffix}.dfu`**
+And wait, if all flashed successfully - you can manually upload IR libs and other stuff to sd card
+
+### Flash everything with ST-Link
 
 Connect your device via ST-Link and run:
 ```sh
@@ -146,10 +129,11 @@ Connect your device via ST-Link and run:
 
 # Links
 
-* Discord: [discord.gg/58D6E8BtTU](https://discord.gg/58D6E8BtTU)
-* Website: [flipperzero.one](https://flipperzero.one)
-* Kickstarter page: [kickstarter.com](https://www.kickstarter.com/projects/flipper-devices/flipper-zero-tamagochi-for-hackers)
-* Forum: [forum.flipperzero.one](https://forum.flipperzero.one/)
+* Unofficial Discord: [discord.gg/58D6E8BtTU](https://discord.gg/58D6E8BtTU)
+
+* Official Discord: [https://flipperzero.one/discord](https://flipperzero.one/discord)
+* Official Website: [flipperzero.one](https://flipperzero.one)
+* Official Forum: [forum.flipperzero.one](https://forum.flipperzero.one/)
 
 # Project structure
 
