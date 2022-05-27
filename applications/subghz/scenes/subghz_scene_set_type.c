@@ -391,7 +391,6 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
             }
             subghz_transmitter_free(subghz->txrx->transmitter);
             break;
-
         default:
             return false;
             break;
