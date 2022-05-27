@@ -1,4 +1,5 @@
 #pragma once
+#include "m-string.h"
 #include <furi.h>
 #include <furi_hal.h>
 

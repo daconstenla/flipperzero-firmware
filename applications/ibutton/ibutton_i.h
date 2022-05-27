@@ -41,7 +41,7 @@ struct iButton {
     iButtonWorker* key_worker;
     iButtonKey* key;
 
-    char file_name[IBUTTON_FILE_NAME_SIZE];
+    string_t file_path;
     char text_store[IBUTTON_TEXT_STORE_SIZE + 1];
 
     Submenu* submenu;

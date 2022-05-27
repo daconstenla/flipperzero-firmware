@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 #include "music_player_worker.h"
 
+=======
+#include "assets_icons.h"
+#include "m-string.h"
+>>>>>>> 663499911 (fetch big commit from upstream)
 #include <furi.h>
 #include <furi_hal.h>
 
