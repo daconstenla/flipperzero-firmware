@@ -1,8 +1,7 @@
 #include "ibutton.h"
-#include "assets_icons.h"
 #include "ibutton_i.h"
 #include "ibutton/scenes/ibutton_scene.h"
-#include "m-string.h"
+
 #include <toolbox/path.h>
 #include <flipper_format/flipper_format.h>
 #include <rpc/rpc_app.h>
@@ -119,8 +118,6 @@ void ibutton_tick_event_callback(void* context) {
 iButton* ibutton_alloc() {
     iButton* ibutton = malloc(sizeof(iButton));
 
-    string_init(ibutton->file_path);
-
     ibutton->scene_manager = scene_manager_alloc(&ibutton_scene_handlers, ibutton);
 
     ibutton->view_dispatcher = view_dispatcher_alloc();
@@ -210,8 +207,6 @@ void ibutton_free(iButton* ibutton) {
     ibutton_worker_free(ibutton->key_worker);
     ibutton_key_free(ibutton->key);
 
-    string_clear(ibutton->file_path);
-
     free(ibutton);
 }
 
@@ -229,6 +224,21 @@ bool ibutton_file_select(iButton* ibutton) {
         success = ibutton_load_key_data(ibutton, ibutton->file_path, true);
     }
 
+    return success;
+}
+
+bool ibutton_load_key(iButton* ibutton, const char* key_name) {
+    string_t key_path;
+    string_init_set_str(key_path, key_name);
+
+    const bool success = ibutton_load_key_data(ibutton, key_path);
+
+    if(success) {
+        path_extract_filename_no_ext(key_name, key_path);
+        ibutton_key_set_name(ibutton->key, string_get_cstr(key_path));
+    }
+
+    string_clear(key_path);
     return success;
 }
 
@@ -288,8 +298,17 @@ bool ibutton_save_key(iButton* ibutton, const char* key_name) {
 }
 
 bool ibutton_delete_key(iButton* ibutton) {
+    string_t file_name;
     bool result = false;
-    result = storage_simply_remove(ibutton->storage, string_get_cstr(ibutton->file_path));
+
+    string_init_printf(
+        file_name,
+        "%s/%s%s",
+        IBUTTON_APP_FOLDER,
+        ibutton_key_get_name_p(ibutton->key),
+        IBUTTON_APP_EXTENSION);
+    result = storage_simply_remove(ibutton->storage, string_get_cstr(file_name));
+    string_clear(file_name);
 
     return result;
 }
