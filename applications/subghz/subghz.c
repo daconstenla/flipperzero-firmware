@@ -1,5 +1,7 @@
 /* Abandon hope, all ye who enter here. */
 
+#include "m-string.h"
+#include "subghz/types.h"
 #include "subghz_i.h"
 #include <lib/toolbox/path.h>
 
@@ -59,6 +61,9 @@ void subghz_blink_stop(SubGhz* instance) {
 
 SubGhz* subghz_alloc() {
     SubGhz* subghz = malloc(sizeof(SubGhz));
+
+    string_init(subghz->file_path);
+    string_init(subghz->file_path_tmp);
 
     // GUI
     subghz->gui = furi_record_open(RECORD_GUI);
@@ -297,9 +302,9 @@ void subghz_free(SubGhz* subghz) {
     furi_record_close(RECORD_NOTIFICATION);
     subghz->notifications = NULL;
 
-    // About birds
-    furi_assert(subghz->file_path[SUBGHZ_MAX_LEN_NAME] == 0);
-    furi_assert(subghz->file_path_tmp[SUBGHZ_MAX_LEN_NAME] == 0);
+    // Path strings
+    string_clear(subghz->file_path);
+    string_clear(subghz->file_path_tmp);
 
     // The rest
     free(subghz);
