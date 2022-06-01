@@ -207,8 +207,9 @@ void subghz_tx_stop(SubGhz* subghz) {
 
     //if protocol dynamic then we save the last upload
     if((subghz->txrx->decoder_result->protocol->type == SubGhzProtocolTypeDynamic) &&
-       (strcmp(subghz->file_path, ""))) {
-        subghz_save_protocol_to_file(subghz, subghz->txrx->fff_data, subghz->file_path);
+       (subghz_path_is_file(subghz->file_path))) {
+        subghz_save_protocol_to_file(
+            subghz, subghz->txrx->fff_data, string_get_cstr(subghz->file_path));
     }
     subghz_idle(subghz);
     notification_message(subghz->notifications, &sequence_reset_red);
@@ -382,10 +383,10 @@ bool subghz_get_next_name_file(SubGhz* subghz, uint8_t max_len) {
 
     bool res = false;
 
-    if(strcmp(subghz->file_path, "")) {
+    if(subghz_path_is_file(subghz->file_path)) {
         //get the name of the next free file
-        path_extract_filename_no_ext(subghz->file_path, file_name);
-        path_extract_dirname(subghz->file_path, file_path);
+        path_extract_filename(subghz->file_path, file_name, true);
+        path_extract_dirname(string_get_cstr(subghz->file_path), file_path);
 
         storage_get_next_filename(
             storage,
@@ -401,7 +402,7 @@ bool subghz_get_next_name_file(SubGhz* subghz, uint8_t max_len) {
             string_get_cstr(file_path),
             string_get_cstr(file_name),
             SUBGHZ_APP_EXTENSION);
-        strncpy(subghz->file_path, string_get_cstr(temp_str), SUBGHZ_MAX_LEN_NAME);
+        string_set(subghz->file_path, temp_str);
         res = true;
     }
 
@@ -461,13 +462,14 @@ bool subghz_load_protocol_from_file(SubGhz* subghz) {
     string_init(file_path);
 
     // Input events and views are managed by file_select
-    bool res = dialog_file_select_show(
+    bool res = dialog_file_browser_show(
         subghz->dialogs,
-        SUBGHZ_APP_FOLDER,
-        SUBGHZ_APP_EXTENSION,
         subghz->file_path,
-        sizeof(subghz->file_path),
-        NULL);
+        subghz->file_path,
+        SUBGHZ_APP_EXTENSION,
+        true,
+        &I_sub1_10px,
+        true);
 
     if(res) {
         res = subghz_key_load(subghz, string_get_cstr(subghz->file_path), true);
@@ -484,9 +486,9 @@ bool subghz_rename_file(SubGhz* subghz) {
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
 
-    if(strcmp(subghz->file_path_tmp, subghz->file_path)) {
-        FS_Error fs_result =
-            storage_common_rename(storage, subghz->file_path_tmp, subghz->file_path);
+    if(string_cmp(subghz->file_path_tmp, subghz->file_path)) {
+        FS_Error fs_result = storage_common_rename(
+            storage, string_get_cstr(subghz->file_path_tmp), string_get_cstr(subghz->file_path));
 
         if(fs_result != FSE_OK) {
             dialog_message_show_storage_error(subghz->dialogs, "Cannot rename\n file/directory");
@@ -512,8 +514,12 @@ bool subghz_delete_file(SubGhz* subghz) {
 
 void subghz_file_name_clear(SubGhz* subghz) {
     furi_assert(subghz);
-    memset(subghz->file_path, 0, sizeof(subghz->file_path));
-    memset(subghz->file_path_tmp, 0, sizeof(subghz->file_path_tmp));
+    string_set_str(subghz->file_path, SUBGHZ_APP_FOLDER);
+    string_reset(subghz->file_path_tmp);
+}
+
+bool subghz_path_is_file(string_t path) {
+    return string_end_with_str_p(path, SUBGHZ_APP_EXTENSION);
 }
 
 uint32_t subghz_random_serial(void) {

@@ -42,7 +42,7 @@ static const uint8_t furi_hal_subghz_preset_ook_async_patable[8] = {
     0x00};
 static const uint8_t furi_hal_subghz_preset_ook_async_patable_au[8] = {
     0x00,
-    0xC0, // 12dBm 0xC0, 10dBm 0xC5, 7dBm 0xCD, 5dBm 0x86, 0dBm 0x50, -6dBm 0x37, -10dBm 0x26, -15dBm 0x1D, -20dBm 0x17, -30dBm 0x03
+    0x37, // 12dBm 0xC0, 10dBm 0xC5, 7dBm 0xCD, 5dBm 0x86, 0dBm 0x50, -6dBm 0x37, -10dBm 0x26, -15dBm 0x1D, -20dBm 0x17, -30dBm 0x03
     0x00,
     0x00,
     0x00,
@@ -387,6 +387,7 @@ bool furi_hal_subghz_is_tx_allowed(uint32_t value) {
     UNUSED(value);
     // Removed region check
     return true;
+
     //checking regional settings
     bool is_allowed = false;
     switch(furi_hal_version_get_hw_region()) {

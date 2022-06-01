@@ -28,6 +28,7 @@ static const uint32_t subghz_frequency_list[] = {
     418000000,
     433075000, /* LPD433 first */
     433420000,
+    433889000, /* ROGUE? */
     433920000 | FREQUENCY_FLAG_DEFAULT, /* LPD433 mid */
     434420000,
     434775000, /* LPD433 last channels */
@@ -357,7 +358,7 @@ void subghz_setting_load(SubGhzSetting* instance, const char* file_path) {
                 break;
             }
             while(flipper_format_read_uint32(
-                fff_data_file, "Frequency", (uint32_t*)&temp_data32, 1)) {
+                fff_data_file, "frequency", (uint32_t*)&temp_data32, 1)) {
                 if(furi_hal_subghz_is_frequency_valid(temp_data32)) {
                     FURI_LOG_I(TAG, "Frequency loaded %lu", temp_data32);
                     FrequencyList_push_back(instance->frequencies, temp_data32);
@@ -372,7 +373,7 @@ void subghz_setting_load(SubGhzSetting* instance, const char* file_path) {
                 break;
             }
             while(flipper_format_read_uint32(
-                fff_data_file, "Hopper_frequency", (uint32_t*)&temp_data32, 1)) {
+                fff_data_file, "hopper_frequency", (uint32_t*)&temp_data32, 1)) {
                 if(furi_hal_subghz_is_frequency_valid(temp_data32)) {
                     FURI_LOG_I(TAG, "Hopper frequency loaded %lu", temp_data32);
                     FrequencyList_push_back(instance->hopper_frequencies, temp_data32);

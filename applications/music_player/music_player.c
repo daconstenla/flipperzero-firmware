@@ -308,7 +308,8 @@ int32_t music_player_app(void* p) {
             DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
             bool res = dialog_file_browser_show(
                 dialogs,
-                MUSIC_PLAYER_APP_PATH_FOLDER,
+                file_path,
+                file_path,
                 MUSIC_PLAYER_APP_EXTENSION,
                 true,
                 &I_music_10px,
@@ -319,9 +320,6 @@ int32_t music_player_app(void* p) {
                 FURI_LOG_E(TAG, "No file selected");
                 break;
             }
-            string_cat_str(file_path, MUSIC_PLAYER_APP_PATH_FOLDER);
-            string_cat_str(file_path, "/");
-            string_cat_str(file_path, file_name);
         }
 
         if(!music_player_worker_load(music_player->worker, string_get_cstr(file_path))) {
