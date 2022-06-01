@@ -19,6 +19,9 @@ $ git clone --recursive https://github.com/Eng1n33r/flipperzero-firmware.git
 Flipper Zero's firmware consists of two components:
 
 Please help us realize emulation for all dynamic (rolling codes) protocols and brute-force app!
+<br>
+<br>
+
 
 ### Core1 Firmware
 ### This software is for experimental purposes only and is not meant for any illegal activity/purposes. <br> We do not condone illegal activity and strongly encourage keeping transmissions to legal/valid uses allowed by law. <br> Also this software is made without any support from Flipper Devices and in no way related to official devs.
@@ -31,11 +34,20 @@ Our Discord Community:
 <br>
 <a href="https://discord.gg/58D6E8BtTU"><img src="https://discordapp.com/api/guilds/937479784148115456/widget.png?style=banner4" alt="Unofficial Discord Community"></a>
 
+<br>
+<br>
+<br>
 
 # Update firmware
 
-[Get Latest Firmware from GitHub Releases](https://github.com/Eng1n33r/flipperzero-firmware)
+## [Get Latest Firmware from GitHub Releases](https://github.com/Eng1n33r/flipperzero-firmware)
 
+<br>
+<br>
+
+## With offline update on flipper
+
+### **Replace (CURRENT VERSION) with version that you downloaded from releases**
 - Unpack `flipper-z-f7-update-(CURRENT VERSION).tgz` (or `.zip`) into any free folder on your PC or smartphone
 - You should find folder named `f7-update-(CURRENT VERSION)` that contains files like `update.fuf` `resources.tar` and etc..
 - Remove microSD card from flipper and insert it into PC or smartphone
@@ -43,10 +55,26 @@ Our Discord Community:
 - So it should be like `update/f7-update-(CURRENT VERSION)/update.fuf` and other files, remember iOS default Files app doesnt show all files properly (3 instead of 5), so you need to use another app for unpacking or use PC or Android
 - After all you need to insert microSD card back into flipper, navigate into filebrowser, open this file
 
+- After all you need to insert microSD card back into flipper, navigate into filebrowser, open this file
 `update/f7-update-(CURRENT VERSION)/update.fuf`
-- Update will start, wait for all stages, when flipper is started after update, you can upload any custom [IR libs](https://github.com/logickworkshop/Flipper-IRDB), and other stuff using qFlipper or directly into microSD card
+- Update will start, wait for all stages, and when flipper started after update, you can upload any custom [IR libs](https://github.com/logickworkshop/Flipper-IRDB), and other stuff using qFlipper or directly into microSD card
 
-## With USB DFU
+<br>
+<br>
+
+## With qFlipper
+
+### **Replace (CURRENT VERSION) with version that you downloaded from releases**
+- Connect your device and select `Update from file`
+then select **`flipper-z-f7-full-(CURRENT VERSION).dfu`**
+
+- And wait, if all flashed successfully - you can manually upload IR libs and other stuff to sd card
+
+- If you doing install for first time or migrating from official fw, unpack 3 folders from archive `sd-card-(CURRENT VERSION).zip` onto your microSD card
+
+
+<br>
+<br>
 
 1. Download latest [Firmware](https://update.flipperzero.one)
 
@@ -55,7 +83,19 @@ Our Discord Community:
  - Release `↩ Back` and keep holding `← Left` until blue LED lights up
  - Release `← Left`
 
+### **Replace (CURRENT VERSION) with version that you downloaded from releases**
 3. Run `dfu-util -D flipper-z-f7-full-(CURRENT VERSION).dfu -a 0`
+
+4. If you doing install for first time or migrating from official fw, unpack 3 folders from archive `sd-card-(CURRENT VERSION).zip` onto your microSD card
+
+<br>
+<br>
+
+# Where I can find IR, SubGhz, ... DBs, and other stuff?
+## [Awesome Flipper Zero - Github](https://github.com/djsime1/awesome-flipperzero)
+
+<br>
+<br>
 
 # How to Build by yourself:
 
@@ -130,9 +170,9 @@ Connect your device via ST-Link and run:
 # Links
 
 * Unofficial Discord: [discord.gg/58D6E8BtTU](https://discord.gg/58D6E8BtTU)
+* Docs by atmanos: [https://flipper.atmanos.com/docs](https://flipper.atmanos.com/docs/your-first-program/intro)
 
-* Official Discord: [https://flipperzero.one/discord](https://flipperzero.one/discord)
-* Official Website: [flipperzero.one](https://flipperzero.one)
+* Official Docs: [http://docs.flipperzero.one](http://docs.flipperzero.one)
 * Official Forum: [forum.flipperzero.one](https://forum.flipperzero.one/)
 
 # Project structure
