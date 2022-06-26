@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <furi.h>
-#include <furi_hal.h>
 
 void set_random_name(char* name, uint8_t max_name_size) {
     static bool rand_generator_inited = false;
@@ -20,18 +19,26 @@ void set_random_name(char* name, uint8_t max_name_size) {
     };
 
     const char* suffix[] = {
-        "door",
-        "entrance",
-        "doorway",
-        "entry",
-        "portal",
-        "entree",
-        "opening",
-        "crack",
         "access",
+        "anomalija",
+        "artefact",
+        "burer",
         "corridor",
+        "crack",
+        "door",
+        "doorway",
+        "entrance",
+        "entree",
+        "entry",
+        "habar",
+        "maslina",
+        "monolit",
+        "opening",
         "passage",
         "port",
+        "portal",
+        "sidorovich",
+        "sus",
     };
     uint8_t prefix_i = rand() % COUNT_OF(prefix);
     uint8_t suffix_i = rand() % COUNT_OF(suffix);

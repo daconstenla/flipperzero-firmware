@@ -69,12 +69,16 @@ FIRMWARE_APPS = {
         "updater_app",
         "storage_move_to_sd",
         "archive",
+        # Custom Apps
+        "custom_apps",
         # Settings
         "passport",
         "system_settings",
         "about",
         # Plugins
         "basic_plugins",
+        # Custom Games
+        "custom_games",
         # Debug
         "debug_apps",
     ],
