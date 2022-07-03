@@ -86,7 +86,6 @@ typedef enum {
     SubGhzLoadKeyStateParseErr,
     SubGhzLoadKeyStateOnlyRx,
 } SubGhzLoadKeyState;
->>>>>>> 310e14002 (fixes)
 
 typedef struct {
     uint8_t fix[4];
