@@ -146,7 +146,7 @@ bool subghz_protocol_faac_slh_create_data(
     FlipperFormat* flipper_format,
     uint32_t serial,
     uint8_t btn,
-    uint16_t cnt,
+    uint32_t cnt,
     uint32_t seed,
     const char* manufacture_name,
     uint32_t frequency,
@@ -155,7 +155,7 @@ bool subghz_protocol_faac_slh_create_data(
     SubGhzProtocolEncoderFaacSLH* instance = context;
     instance->generic.serial = serial;
     instance->generic.btn = btn;
-    instance->generic.cnt = cnt;
+    instance->generic.cnt = (cnt & 0xFFFFF);
     instance->generic.seed = seed;
     instance->manufacture_name = manufacture_name;
     instance->generic.data_count_bit = 64;
@@ -402,7 +402,7 @@ static void subghz_protocol_faac_slh_check_remote_controller(
                 break;
             }
         }
-    instance->cnt = decrypt & 0xFFFF;
+    instance->cnt = decrypt & 0xFFFFF;
 }
 
 uint8_t subghz_protocol_decoder_faac_slh_get_hash_data(void* context) {
@@ -479,9 +479,9 @@ void subghz_protocol_decoder_faac_slh_get_string(void* context, string_t output)
         output,
         "%s %dbit\r\n"
         "Key:%lX%08lX\r\n"
-        "Fix:%08lX \r\n"
-        "Hop:%08lX \r\n"
-        "Sn:%07lX Btn:%lX\r\n",
+        "Fix:%08lX    Cnt:%05X\r\n"
+        "Hop:%08lX    Btn:%lX\r\n"
+        "Sn:%07lX Sd:%8X",
         instance->generic.protocol_name,
         instance->generic.data_count_bit,
         (uint32_t)(instance->generic.data >> 32),
