@@ -92,7 +92,7 @@ void star_line_reset_kl_type() {
     kl_type = 0;
 }
 
-/** 
+/**
  * Analysis of received data
  * @param instance Pointer to a SubGhzBlockGeneric* instance
  * @param keystore Pointer to a SubGhzKeystore* instance
@@ -124,7 +124,7 @@ void subghz_protocol_encoder_star_line_free(void* context) {
     free(instance);
 }
 
-/** 
+/**
  * Key generation from simple data
  * @param instance Pointer to a SubGhzProtocolEncoderKeeloq* instance
  * @param btn Button number, 4 bit
@@ -193,8 +193,7 @@ bool subghz_protocol_star_line_create_data(
     uint8_t btn,
     uint16_t cnt,
     const char* manufacture_name,
-    uint32_t frequency,
-    FuriHalSubGhzPreset preset) {
+    SubGhzPresetDefinition* preset) {
     furi_assert(context);
     SubGhzProtocolEncoderStarLine* instance = context;
     instance->generic.serial = serial;
@@ -454,13 +453,13 @@ static inline bool subghz_protocol_star_line_check_decrypt(
     return false;
 }
 
-/** 
+/**
  * Checking the accepted code against the database manafacture key
  * @param instance Pointer to a SubGhzBlockGeneric* instance
  * @param fix Fix part of the parcel
  * @param hop Hop encrypted part of the parcel
  * @param keystore Pointer to a SubGhzKeystore* instance
- * @param manufacture_name 
+ * @param manufacture_name
  * @return true on successful search
  */
 static uint8_t subghz_protocol_star_line_check_remote_controller_selector(
@@ -641,7 +640,7 @@ static uint8_t subghz_protocol_star_line_check_remote_controller_selector(
     return 0;
 }
 
-/** 
+/**
  * Analysis of received data
  * @param instance Pointer to a SubGhzBlockGeneric* instance
  * @param keystore Pointer to a SubGhzKeystore* instance

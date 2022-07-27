@@ -6,7 +6,7 @@
 #include "../blocks/generic.h"
 #include "../blocks/math.h"
 
-#define TAG "SubGhzProtocolFaacSHL"
+#define TAG "SubGhzProtocolFaacSLH"
 
 static const SubGhzBlockConst subghz_protocol_faac_slh_const = {
     .te_short = 255,
@@ -149,8 +149,7 @@ bool subghz_protocol_faac_slh_create_data(
     uint32_t cnt,
     uint32_t seed,
     const char* manufacture_name,
-    uint32_t frequency,
-    FuriHalSubGhzPreset preset) {
+    SubGhzPresetDefinition* preset) {
     furi_assert(context);
     SubGhzProtocolEncoderFaacSLH* instance = context;
     instance->generic.serial = serial;

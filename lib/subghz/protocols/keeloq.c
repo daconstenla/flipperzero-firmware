@@ -167,15 +167,6 @@ static bool subghz_protocol_keeloq_gen_data(SubGhzProtocolEncoderKeeloq* instanc
                     hop = subghz_protocol_keeloq_common_encrypt(decrypt, man);
                     break;
                 case KEELOQ_LEARNING_UNKNOWN:
-<<<<<<< HEAD
-                    if(kl_type == 1) { hop = subghz_protocol_keeloq_common_encrypt(decrypt, manufacture_code->key); }
-                    if(kl_type == 2) { man = subghz_protocol_keeloq_common_normal_learning(fix, manufacture_code->key);
-                                       hop = subghz_protocol_keeloq_common_encrypt(decrypt, man); }
-                    if(kl_type == 3) { man = subghz_protocol_keeloq_common_secure_learning(fix, instance->generic.seed, manufacture_code->key);
-                                       hop = subghz_protocol_keeloq_common_encrypt(decrypt, man); }
-                    if(kl_type == 4) { man = subghz_protocol_keeloq_common_magic_xor_type1_learning(instance->generic.serial, manufacture_code->key);
-                                       hop = subghz_protocol_keeloq_common_encrypt(decrypt, man); }
-=======
                     if(kl_type == 1) {
                         hop =
                             subghz_protocol_keeloq_common_encrypt(decrypt, manufacture_code->key);
@@ -195,7 +186,6 @@ static bool subghz_protocol_keeloq_gen_data(SubGhzProtocolEncoderKeeloq* instanc
                             instance->generic.serial, manufacture_code->key);
                         hop = subghz_protocol_keeloq_common_encrypt(decrypt, man);
                     }
->>>>>>> 767f7ff92 (code formatted)
                     break;
                 }
                 break;
@@ -217,8 +207,7 @@ bool subghz_protocol_keeloq_create_data(
     uint8_t btn,
     uint16_t cnt,
     const char* manufacture_name,
-    uint32_t frequency,
-    FuriHalSubGhzPreset preset) {
+    SubGhzPresetDefinition* preset) {
     furi_assert(context);
     SubGhzProtocolEncoderKeeloq* instance = context;
     instance->generic.serial = serial;
@@ -241,8 +230,7 @@ bool subghz_protocol_keeloq_bft_create_data(
     uint16_t cnt,
     uint32_t seed,
     const char* manufacture_name,
-    uint32_t frequency,
-    FuriHalSubGhzPreset preset) {
+    SubGhzPresetDefinition* preset) {
     furi_assert(context);
     SubGhzProtocolEncoderKeeloq* instance = context;
     instance->generic.serial = serial;
@@ -342,13 +330,8 @@ bool subghz_protocol_encoder_keeloq_deserialize(void* context, FlipperFormat* fl
         if(!flipper_format_read_hex(flipper_format, "Seed", seed_data, sizeof(uint32_t))) {
             FURI_LOG_E(TAG, "Missing Seed");
         }
-<<<<<<< HEAD
-        instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 | seed_data[3] ;
-        FURI_LOG_I(TAG, "encoder seed = %8X", instance->generic.seed);
-=======
         instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 |
                                  seed_data[3];
->>>>>>> 767f7ff92 (code formatted)
 
         subghz_protocol_keeloq_check_remote_controller(
             &instance->generic, instance->keystore, &instance->manufacture_name);
@@ -697,10 +680,7 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
     } else if(strcmp(mfname, "Unknown") == 0) {
         return 1;
     } else {
-<<<<<<< HEAD
 
-=======
->>>>>>> 767f7ff92 (code formatted)
     for
         M_EACH(manufacture_code, *subghz_keystore_get_data(keystore), SubGhzKeyArray_t) {
             res = strcmp(string_get_cstr(manufacture_code->name), mfname);
@@ -838,10 +818,6 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                     break;
                 }
             }
-<<<<<<< HEAD
-            }
-=======
->>>>>>> 767f7ff92 (code formatted)
         }
     }
 
@@ -895,7 +871,6 @@ bool subghz_protocol_decoder_keeloq_serialize(
     bool res =
         subghz_block_generic_serialize(&instance->generic, flipper_format, frequency, preset);
 
-<<<<<<< HEAD
     uint8_t seed_data[sizeof(uint32_t)] = {0};
         for(size_t i = 0; i < sizeof(uint32_t); i++) {
             seed_data[sizeof(uint32_t) - i - 1] = (instance->generic.seed >> i * 8) & 0xFF;
@@ -907,8 +882,6 @@ bool subghz_protocol_decoder_keeloq_serialize(
     instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 | seed_data[3] ;
         FURI_LOG_I(TAG, "decoder seed = %8X", instance->generic.seed);
 
-=======
->>>>>>> 767f7ff92 (code formatted)
     subghz_protocol_keeloq_check_remote_controller(
         &instance->generic, instance->keystore, &instance->manufacture_name);
 
@@ -940,13 +913,8 @@ bool subghz_protocol_decoder_keeloq_deserialize(void* context, FlipperFormat* fl
         if(!flipper_format_read_hex(flipper_format, "Seed", seed_data, sizeof(uint32_t))) {
             FURI_LOG_E(TAG, "Missing Seed");
         }
-<<<<<<< HEAD
-        instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 | seed_data[3] ;
-        FURI_LOG_I(TAG, "decoder seed = %8X", instance->generic.seed);
-=======
         instance->generic.seed = seed_data[0] << 24 | seed_data[1] << 16 | seed_data[2] << 8 |
                                  seed_data[3];
->>>>>>> 767f7ff92 (code formatted)
         res = true;
     } while(false);
 

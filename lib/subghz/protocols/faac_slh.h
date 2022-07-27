@@ -33,8 +33,7 @@ void subghz_protocol_encoder_faac_slh_free(void* context);
  * @param cnt Counter value, 16 bit
  * @param seed Seed value, 32 bit
  * @param manufacture_name Name of manufacturer's key
- * @param frequency Transmission frequency, Hz
- * @param preset Modulation, FuriHalSubGhzPreset
+ * @param preset Modulation, SubGhzPresetDefinition
  * @return true On success
  */
 bool subghz_protocol_faac_slh_create_data(
@@ -45,8 +44,7 @@ bool subghz_protocol_faac_slh_create_data(
     uint32_t cnt,
     uint32_t seed,
     const char* manufacture_name,
-    uint32_t frequency,
-    FuriHalSubGhzPreset preset);
+    SubGhzPresetDefinition* preset);
 
 /**
  * Deserialize and generating an upload to send.
@@ -65,7 +63,7 @@ void subghz_protocol_encoder_faac_slh_stop(void* context);
 /**
  * Getting the level and duration of the upload to be loaded into DMA.
  * @param context Pointer to a SubGhzProtocolEncoderFaacSLH instance
- * @return LevelDuration 
+ * @return LevelDuration
  */
 LevelDuration subghz_protocol_encoder_faac_slh_yield(void* context);
 
