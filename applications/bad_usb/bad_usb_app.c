@@ -27,7 +27,7 @@ BadUsbApp* bad_usb_app_alloc(char* arg) {
     BadUsbApp* app = malloc(sizeof(BadUsbApp));
 
     string_init(app->file_path);
-
+    string_init(app->keyboard_layout);
     if(arg && strlen(arg)) {
         string_set_str(app->file_path, arg);
     }
