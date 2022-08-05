@@ -1,6 +1,7 @@
 #include "nfca.h"
 #include <string.h>
 #include <stdio.h>
+#include <furi.h>
 
 #define NFCA_CMD_RATS (0xE0U)
 

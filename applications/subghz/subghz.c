@@ -293,6 +293,7 @@ void subghz_free(SubGhz* subghz) {
     flipper_format_free(subghz->txrx->fff_data);
     subghz_history_free(subghz->txrx->history);
     string_clear(subghz->txrx->preset->name);
+    free(subghz->txrx->preset);
     free(subghz->txrx->secure_data);
     free(subghz->txrx);
 

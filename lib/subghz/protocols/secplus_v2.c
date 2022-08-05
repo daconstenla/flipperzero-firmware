@@ -505,9 +505,9 @@ static void
     instance->encoder.size_upload = index;
 }
 
-bool subghz_protocol_decoder_secplus_v2_deserialize(void* context, FlipperFormat* flipper_format) {
+bool subghz_protocol_encoder_secplus_v2_deserialize(void* context, FlipperFormat* flipper_format) {
     furi_assert(context);
-    SubGhzProtocolDecoderSecPlus_v2* instance = context;
+    SubGhzProtocolEncoderSecPlus_v2* instance = context;
     bool res = false;
     do {
         if(!subghz_block_generic_deserialize(&instance->generic, flipper_format)) {
@@ -519,10 +519,6 @@ bool subghz_protocol_decoder_secplus_v2_deserialize(void* context, FlipperFormat
             FURI_LOG_E(TAG, "Wrong number of bits in key");
             break;
         }
-        if(!flipper_format_rewind(flipper_format)) {
-            FURI_LOG_E(TAG, "Rewind error");
-            break;
-        }
         uint8_t key_data[sizeof(uint64_t)] = {0};
         if(!flipper_format_read_hex(
                flipper_format, "Secplus_packet_1", key_data, sizeof(uint64_t))) {
@@ -532,6 +528,35 @@ bool subghz_protocol_decoder_secplus_v2_deserialize(void* context, FlipperFormat
         for(uint8_t i = 0; i < sizeof(uint64_t); i++) {
             instance->secplus_packet_1 = instance->secplus_packet_1 << 8 | key_data[i];
         }
+
+        subghz_protocol_secplus_v2_remote_controller(
+            &instance->generic, instance->secplus_packet_1);
+        subghz_protocol_secplus_v2_encode(instance);
+        //optional parameter parameter
+        flipper_format_read_uint32(
+            flipper_format, "Repeat", (uint32_t*)&instance->encoder.repeat, 1);
+        subghz_protocol_encoder_secplus_v2_get_upload(instance);
+
+        //update data
+        for(size_t i = 0; i < sizeof(uint64_t); i++) {
+            key_data[sizeof(uint64_t) - i - 1] = (instance->generic.data >> i * 8) & 0xFF;
+        }
+        if(!flipper_format_update_hex(flipper_format, "Key", key_data, sizeof(uint64_t))) {
+            FURI_LOG_E(TAG, "Unable to add Key");
+            break;
+        }
+
+        for(size_t i = 0; i < sizeof(uint64_t); i++) {
+            key_data[sizeof(uint64_t) - i - 1] = (instance->secplus_packet_1 >> i * 8) & 0xFF;
+        }
+        if(!flipper_format_update_hex(
+               flipper_format, "Secplus_packet_1", key_data, sizeof(uint64_t))) {
+            FURI_LOG_E(TAG, "Unable to add Secplus_packet_1");
+            break;
+        }
+
+        instance->encoder.is_runing = true;
+
         res = true;
     } while(false);
 

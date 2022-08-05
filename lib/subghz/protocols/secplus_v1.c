@@ -555,18 +555,6 @@ bool subghz_protocol_secplus_v1_check_fixed(uint32_t fixed) {
     return true;
 }
 
-bool subghz_protocol_secplus_v1_check_fixed(uint32_t fixed) {
-    //uint8_t id0 = (fixed / 3) % 3;
-    uint8_t id1 = (fixed / 9) % 3;
-    uint8_t btn = fixed % 3;
-
-    do {
-        if(id1 == 0) return false;
-        if(!(btn == 0 || btn == 1 || btn == 2)) return false;
-    } while(false);
-    return true;
-}
-
 void subghz_protocol_decoder_secplus_v1_get_string(void* context, string_t output) {
     furi_assert(context);
     SubGhzProtocolDecoderSecPlus_v1* instance = context;

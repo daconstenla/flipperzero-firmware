@@ -3,6 +3,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <lib/digital_signal/digital_signal.h>
+
+typedef struct {
+    DigitalSignal* one;
+    DigitalSignal* zero;
+    DigitalSignal* tx_signal;
+} NfcaSignal;
+
 uint16_t nfca_get_crc16(uint8_t* buff, uint16_t len);
 
 void nfca_append_crc16(uint8_t* buff, uint16_t len);

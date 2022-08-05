@@ -1,4 +1,8 @@
 #include "faac_slh.h"
+#include "../subghz_keystore.h"
+#include <m-string.h>
+#include <m-array.h>
+#include "keeloq_common.h"
 
 #include "../blocks/const.h"
 #include "../blocks/decoder.h"
@@ -20,6 +24,9 @@ struct SubGhzProtocolDecoderFaacSLH {
 
     SubGhzBlockDecoder decoder;
     SubGhzBlockGeneric generic;
+
+    SubGhzKeystore* keystore;
+    const char* manufacture_name;
 };
 
 struct SubGhzProtocolEncoderFaacSLH {
@@ -27,6 +34,9 @@ struct SubGhzProtocolEncoderFaacSLH {
 
     SubGhzProtocolBlockEncoder encoder;
     SubGhzBlockGeneric generic;
+
+    SubGhzKeystore* keystore;
+    const char* manufacture_name;
 };
 
 typedef enum {
@@ -50,19 +60,20 @@ const SubGhzProtocolDecoder subghz_protocol_faac_slh_decoder = {
 };
 
 const SubGhzProtocolEncoder subghz_protocol_faac_slh_encoder = {
-    .alloc = NULL,
-    .free = NULL,
+    .alloc = subghz_protocol_encoder_faac_slh_alloc,
+    .free = subghz_protocol_encoder_faac_slh_free,
 
-    .deserialize = NULL,
-    .stop = NULL,
-    .yield = NULL,
+    .deserialize = subghz_protocol_encoder_faac_slh_deserialize,
+    .stop = subghz_protocol_encoder_faac_slh_stop,
+    .yield = subghz_protocol_encoder_faac_slh_yield,
 };
 
 const SubGhzProtocol subghz_protocol_faac_slh = {
     .name = SUBGHZ_PROTOCOL_FAAC_SLH_NAME,
     .type = SubGhzProtocolTypeDynamic,
     .flag = SubGhzProtocolFlag_433 | SubGhzProtocolFlag_868 | SubGhzProtocolFlag_AM |
-            SubGhzProtocolFlag_Decodable,
+            SubGhzProtocolFlag_Decodable | SubGhzProtocolFlag_Load | SubGhzProtocolFlag_Save |
+            SubGhzProtocolFlag_Send,
 
     .decoder = &subghz_protocol_faac_slh_decoder,
     .encoder = &subghz_protocol_faac_slh_encoder,
@@ -95,6 +106,7 @@ void* subghz_protocol_encoder_faac_slh_alloc(SubGhzEnvironment* environment) {
 
 void subghz_protocol_encoder_faac_slh_free(void* context) {
     furi_assert(context);
+    // roguemaster don't steal!!!
     SubGhzProtocolEncoderFaacSLH* instance = context;
     free(instance->encoder.upload);
     free(instance);
@@ -114,11 +126,10 @@ static bool subghz_protocol_faac_slh_gen_data(SubGhzProtocolEncoderFaacSLH* inst
     }
     if ((instance->generic.cnt % 2) == 0) {
         decrypt = fixx[6] << 28 | fixx[7] << 24 | fixx[5] << 20 |
-        fixx[1] << 16 | instance->generic.cnt;
-    }
-    else {
+                  (instance->generic.cnt & 0xFFFFF);
+    } else {
         decrypt = fixx[2] << 28 | fixx[3] << 24 | fixx[4] << 20 |
-        fixx[1] << 16 | instance->generic.cnt;
+                  (instance->generic.cnt & 0xFFFFF);
     }
     for
         M_EACH(manufacture_code, *subghz_keystore_get_data(instance->keystore), SubGhzKeyArray_t) {
@@ -151,6 +162,7 @@ bool subghz_protocol_faac_slh_create_data(
     const char* manufacture_name,
     SubGhzPresetDefinition* preset) {
     furi_assert(context);
+    // roguemaster don't steal!!!
     SubGhzProtocolEncoderFaacSLH* instance = context;
     instance->generic.serial = serial;
     instance->generic.btn = btn;
@@ -160,8 +172,7 @@ bool subghz_protocol_faac_slh_create_data(
     instance->generic.data_count_bit = 64;
     bool res = subghz_protocol_faac_slh_gen_data(instance);
     if(res) {
-        res =
-            subghz_block_generic_serialize(&instance->generic, flipper_format, frequency, preset);
+        res = subghz_block_generic_serialize(&instance->generic, flipper_format, preset);
     }
     return res;
 }
@@ -287,6 +298,7 @@ void* subghz_protocol_decoder_faac_slh_alloc(SubGhzEnvironment* environment) {
     SubGhzProtocolDecoderFaacSLH* instance = malloc(sizeof(SubGhzProtocolDecoderFaacSLH));
     instance->base.protocol = &subghz_protocol_faac_slh;
     instance->generic.protocol_name = instance->base.protocol->name;
+    instance->keystore = subghz_environment_get_keystore(environment);
     return instance;
 }
 
@@ -377,6 +389,8 @@ void subghz_protocol_decoder_faac_slh_feed(void* context, bool level, uint32_t d
 /**
  * Analysis of received data
  * @param instance Pointer to a SubGhzBlockGeneric* instance
+ * @param keystore Pointer to a SubGhzKeystore* instance
+ * @param manifacture_name Manufacturer name
  */
 static void subghz_protocol_faac_slh_check_remote_controller(
     SubGhzBlockGeneric* instance,
@@ -418,8 +432,7 @@ bool subghz_protocol_decoder_faac_slh_serialize(
     furi_assert(context);
     SubGhzProtocolDecoderFaacSLH* instance = context;
 
-    bool res =
-        subghz_block_generic_serialize(&instance->generic, flipper_format, frequency, preset);
+    bool res = subghz_block_generic_serialize(&instance->generic, flipper_format, preset);
 
     uint8_t seed_data[sizeof(uint32_t)] = {0};
     for(size_t i = 0; i < sizeof(uint32_t); i++) {
@@ -444,11 +457,16 @@ bool subghz_protocol_decoder_faac_slh_deserialize(void* context, FlipperFormat* 
     bool ret = false;
     do {
         if(!subghz_block_generic_deserialize(&instance->generic, flipper_format)) {
+            FURI_LOG_E(TAG, "Deserialize error");
             break;
         }
         if(instance->generic.data_count_bit !=
            subghz_protocol_faac_slh_const.min_count_bit_for_found) {
             FURI_LOG_E(TAG, "Wrong number of bits in key");
+            break;
+        }
+        if(!flipper_format_rewind(flipper_format)) {
+            FURI_LOG_E(TAG, "Rewind error");
             break;
         }
         uint8_t seed_data[sizeof(uint32_t)] = {0};
@@ -463,6 +481,7 @@ bool subghz_protocol_decoder_faac_slh_deserialize(void* context, FlipperFormat* 
                                  seed_data[3];
         ret = true;
     } while(false);
+
     return ret;
 }
 
@@ -486,7 +505,9 @@ void subghz_protocol_decoder_faac_slh_get_string(void* context, string_t output)
         (uint32_t)(instance->generic.data >> 32),
         (uint32_t)instance->generic.data,
         code_fix,
+        instance->generic.cnt,
         code_hop,
+        instance->generic.btn,
         instance->generic.serial,
-        instance->generic.btn);
+        instance->generic.seed);
 }

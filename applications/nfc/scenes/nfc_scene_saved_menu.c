@@ -104,6 +104,5 @@ bool nfc_scene_saved_menu_on_event(void* context, SceneManagerEvent event) {
 
 void nfc_scene_saved_menu_on_exit(void* context) {
     Nfc* nfc = context;
-//
     submenu_reset(nfc->submenu);
 }

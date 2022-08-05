@@ -288,34 +288,13 @@ uint8_t furi_hal_subghz_get_lqi() {
 }
 
 /*
- Modified by @tkerby to the full YARD Stick One extended range of 281-361 MHz, 378-481 MHz, and 749-962 MHz.
+ Modified by @tkerby & MX to the full YARD Stick One extended range of 281-361 MHz, 378-481 MHz, and 749-962 MHz.
  These changes are at your own risk. The PLL may not lock and FZ devs have warned of possible damage!
- */
+*/
 bool furi_hal_subghz_is_frequency_valid(uint32_t value) {
-    bool is_extended = false;
-
-    // TODO: Move file check to another place
-    Storage* storage = furi_record_open("storage");
-    FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
-
-    if(flipper_format_file_open_existing(fff_data_file, "/ext/subghz/assets/dangerous_settings")) {
-        flipper_format_read_bool(
-            fff_data_file, "yes_i_want_to_destroy_my_flipper", &is_extended, 1);
-    }
-
-    flipper_format_free(fff_data_file);
-    furi_record_close("storage");
-
-    if(!(value >= 299999755 && value <= 348000335) &&
-       !(value >= 386999938 && value <= 464000000) &&
-       !(value >= 778999847 && value <= 928000000) && !(is_extended)) {
-        FURI_LOG_I(TAG, "Frequency blocked - outside default range");
-        return false;
-    } else if(
-        !(value >= 281000000 && value <= 361000000) &&
-        !(value >= 378000000 && value <= 481000000) &&
-        !(value >= 749000000 && value <= 962000000) && is_extended) {
-        FURI_LOG_I(TAG, "Frequency blocked - outside dangerous range");
+    if(!(value >= 281000000 && value <= 361000000) &&
+       !(value >= 378000000 && value <= 481000000) &&
+       !(value >= 749000000 && value <= 962000000)) {
         return false;
     }
 
@@ -338,53 +317,34 @@ uint32_t furi_hal_subghz_set_frequency_and_path(uint32_t value) {
 }
 
 bool furi_hal_subghz_is_tx_allowed(uint32_t value) {
-    UNUSED(value);
-    // Removed region check
-    return true;
+    bool is_extended = false;
 
-    //checking regional settings
-    bool is_allowed = false;
-    switch(furi_hal_version_get_hw_region()) {
-    case FuriHalVersionRegionEuRu:
-        //433,05..434,79; 868,15..868,55
-    if(!(value >= 299999755 && value <= 348000335) &&
-       !(value >= 386999938 && value <= 464000000) &&
-       !(value >= 778999847 && value <= 928000000)) {
-        } else {
-            is_allowed = true;
-        }
-        break;
-    case FuriHalVersionRegionUsCaAu:
-        //304,10..321,95; 433,05..434,79; 915,00..928,00
-    if(!(value >= 299999755 && value <= 348000335) &&
-       !(value >= 386999938 && value <= 464000000) &&
-       !(value >= 778999847 && value <= 928000000)) {
-        } else {
-            if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
-                if((value >= 304100000 && value <= 321950000) &&
-                   ((furi_hal_subghz.preset == FuriHalSubGhzPresetOok270Async) ||
-                    (furi_hal_subghz.preset == FuriHalSubGhzPresetOok650Async))) {
-                    furi_hal_subghz_load_patable(furi_hal_subghz_preset_ook_async_patable_au);
-                }
-            }
-            is_allowed = true;
-        }
-        break;
-    case FuriHalVersionRegionJp:
-        //312,00..315,25; 920,50..923,50
-    if(!(value >= 299999755 && value <= 348000335) &&
-       !(value >= 386999938 && value <= 464000000) &&
-       !(value >= 778999847 && value <= 928000000)) {
-        } else {
-            is_allowed = true;
-        }
-        break;
+    // TODO: !!! Move file check to another place
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
 
-    default:
-        is_allowed = true;
-        break;
+    if(flipper_format_file_open_existing(fff_data_file, "/ext/subghz/assets/dangerous_settings")) {
+        flipper_format_read_bool(
+            fff_data_file, "yes_i_want_to_destroy_my_flipper", &is_extended, 1);
     }
-    return is_allowed;
+
+    flipper_format_free(fff_data_file);
+    furi_record_close(RECORD_STORAGE);
+
+    if(!(value >= 299999755 && value <= 348000335) &&
+       !(value >= 386999938 && value <= 464000000) &&
+       !(value >= 778999847 && value <= 928000000) && !(is_extended)) {
+        FURI_LOG_I(TAG, "Frequency blocked - outside default range");
+        return false;
+    } else if(
+        !(value >= 281000000 && value <= 361000000) &&
+        !(value >= 378000000 && value <= 481000000) &&
+        !(value >= 749000000 && value <= 962000000) && is_extended) {
+        FURI_LOG_I(TAG, "Frequency blocked - outside dangerous range");
+        return false;
+    }
+
+    return true;
 }
 
 uint32_t furi_hal_subghz_set_frequency(uint32_t value) {

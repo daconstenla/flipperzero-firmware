@@ -283,6 +283,11 @@ static void subghz_setting_load_default_region(
 }
 
 void subghz_setting_load_default(SubGhzSetting* instance) {
+    // Region check removed
+    subghz_setting_load_default_region(
+        instance, subghz_frequency_list, subghz_hopper_frequency_list);
+    return;
+
     switch(furi_hal_version_get_hw_region()) {
     case FuriHalVersionRegionEuRu:
         subghz_setting_load_default_region(
@@ -372,7 +377,7 @@ void subghz_setting_load(SubGhzSetting* instance, const char* file_path) {
                 break;
             }
             while(flipper_format_read_uint32(
-                fff_data_file, "hopper_frequency", (uint32_t*)&temp_data32, 1)) {
+                fff_data_file, "Hopper_frequency", (uint32_t*)&temp_data32, 1)) {
                 if(furi_hal_subghz_is_frequency_valid(temp_data32)) {
                     FURI_LOG_I(TAG, "Hopper frequency loaded %lu", temp_data32);
                     FrequencyList_push_back(instance->hopper_frequencies, temp_data32);
