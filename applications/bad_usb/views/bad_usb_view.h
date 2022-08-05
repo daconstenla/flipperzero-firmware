@@ -4,7 +4,7 @@
 #include "../bad_usb_script.h"
 
 typedef struct BadUsb BadUsb;
-typedef void (*BadUsbOkCallback)(InputType type, void* context);
+typedef void (*BadUsbButtonCallback)(InputKey key, void* context);
 
 BadUsb* bad_usb_alloc();
 

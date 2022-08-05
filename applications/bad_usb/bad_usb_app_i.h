@@ -31,9 +31,11 @@ struct BadUsbApp {
     NotificationApp* notifications;
     DialogsApp* dialogs;
     Widget* widget;
+    Submenu* submenu;
 
     BadUsbAppError error;
     string_t file_path;
+    string_t keyboard_layout;
     BadUsb* bad_usb_view;
     BadUsbScript* bad_usb_script;
 };
