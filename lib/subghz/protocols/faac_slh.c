@@ -124,7 +124,7 @@ static bool subghz_protocol_faac_slh_gen_data(SubGhzProtocolEncoderFaacSLH* inst
     for(int i = 0; i < 8; i++) {
         fixx[i] = (fix >> (shiftby -= 4)) & 0xF;
     }
-    if ((instance->generic.cnt % 2) == 0) {
+    if((instance->generic.cnt % 2) == 0) {
         decrypt = fixx[6] << 28 | fixx[7] << 24 | fixx[5] << 20 |
                   (instance->generic.cnt & 0xFFFFF);
     } else {

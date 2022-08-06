@@ -1,40 +1,40 @@
 #include <furi.h>
 #include <gui/gui.h>
+#include <gui/view.h>
 #include <input/input.h>
 #include <stdlib.h>
-#include <gui/view.h>
 
 #define TAG "Arkanoid"
 
-unsigned int COLUMNS = 13; //Columns of bricks
-unsigned int ROWS = 4; //Rows of bricks
-int dx = -1; //Initial movement of ball
-int dy = -1; //Initial movement of ball
-int xb; //Balls starting possition
-int yb; //Balls starting possition
-bool released; //If the ball has been released by the player
-bool paused = false; //If the game has been paused
-int xPaddle; //X position of paddle
-bool isHit[4][13]; //Array of if bricks are hit or not
-bool bounced = false; //Used to fix double bounce glitch
-int lives = 3; //Amount of lives
-int level = 1; //Current level
-unsigned int score = 0; //Score for the game
-unsigned int brickCount; //Amount of bricks hit
-int pad, pad2, pad3; //Button press buffer used to stop pause repeating
+unsigned int COLUMNS = 13; // Columns of bricks
+unsigned int ROWS = 4; // Rows of bricks
+int dx = -1; // Initial movement of ball
+int dy = -1; // Initial movement of ball
+int xb; // Balls starting possition
+int yb; // Balls starting possition
+bool released; // If the ball has been released by the player
+bool paused = false; // If the game has been paused
+int xPaddle; // X position of paddle
+bool isHit[4][13]; // Array of if bricks are hit or not
+bool bounced = false; // Used to fix double bounce glitch
+int lives = 3; // Amount of lives
+int level = 1; // Current level
+unsigned int score = 0; // Score for the game
+unsigned int brickCount; // Amount of bricks hit
+int pad, pad2, pad3; // Button press buffer used to stop pause repeating
 int oldpad, oldpad2, oldpad3;
-char text[16]; //General string buffer
-bool start = false; //If in menu or in game
-bool initialDraw = false; //If the inital draw has happened
-char initials[3]; //Initials used in high score
+char text[16]; // General string buffer
+bool start = false; // If in menu or in game
+bool initialDraw = false; // If the inital draw has happened
+char initials[3]; // Initials used in high score
 
-//Ball Bounds used in collision detection
+// Ball Bounds used in collision detection
 int leftBall;
 int rightBall;
 int topBall;
 int bottomBall;
 
-//Brick Bounds used in collision detection
+// Brick Bounds used in collision detection
 int leftBrick;
 int rightBrick;
 int topBrick;
@@ -75,16 +75,16 @@ void intro(Canvas* canvas) {
     canvas_set_font(canvas, FontPrimary);
     canvas_draw_str(canvas, 46, 0, "Arkanoid");
 
-    //arduboy.tunes.tone(987, 160);
-    //delay(160);
-    //arduboy.tunes.tone(1318, 400);
-    //delay(2000);
+    // arduboy.tunes.tone(987, 160);
+    // delay(160);
+    // arduboy.tunes.tone(1318, 400);
+    // delay(2000);
 }
 
 void move_ball(Canvas* canvas) {
     tick++;
     if(released) {
-        //Move ball
+        // Move ball
         if(abs(dx) == 2) {
             xb += dx / 2;
             // 2x speed is really 1.5 speed
@@ -94,20 +94,20 @@ void move_ball(Canvas* canvas) {
         }
         yb = yb + dy;
 
-        //Set bounds
+        // Set bounds
         leftBall = xb;
         rightBall = xb + 2;
         topBall = yb;
         bottomBall = yb + 2;
 
-        //Bounce off top edge
+        // Bounce off top edge
         if(yb <= 0) {
             yb = 2;
             dy = -dy;
             // arduboy.tunes.tone(523, 250);
         }
 
-        //Lose a life if bottom edge hit
+        // Lose a life if bottom edge hit
         if(yb >= FLIPPER_LCD_HEIGHT) {
             canvas_draw_frame(canvas, xPaddle, FLIPPER_LCD_HEIGHT - 1, 11, 1);
             xPaddle = 54;
@@ -126,25 +126,25 @@ void move_ball(Canvas* canvas) {
             }
         }
 
-        //Bounce off left side
+        // Bounce off left side
         if(xb <= 0) {
             xb = 2;
             dx = -dx;
             // arduboy.tunes.tone(523, 250);
         }
 
-        //Bounce off right side
+        // Bounce off right side
         if(xb >= FLIPPER_LCD_WIDTH - 2) {
             xb = FLIPPER_LCD_WIDTH - 4;
             dx = -dx;
             // arduboy.tunes.tone(523, 250);
         }
 
-        //Bounce off paddle
+        // Bounce off paddle
         if(xb + 1 >= xPaddle && xb <= xPaddle + 12 && yb + 2 >= FLIPPER_LCD_HEIGHT - 1 &&
            yb <= FLIPPER_LCD_HEIGHT) {
             dy = -dy;
-            dx = ((xb - (xPaddle + 6)) / 3); //Applies spin on the ball
+            dx = ((xb - (xPaddle + 6)) / 3); // Applies spin on the ball
             // prevent straight bounce
             if(dx == 0) {
                 dx = (rand_range(0, 2) == 1) ? 1 : -1;
@@ -152,17 +152,17 @@ void move_ball(Canvas* canvas) {
             // arduboy.tunes.tone(200, 250);
         }
 
-        //Bounce off Bricks
+        // Bounce off Bricks
         for(unsigned int row = 0; row < ROWS; row++) {
             for(unsigned int column = 0; column < COLUMNS; column++) {
                 if(!isHit[row][column]) {
-                    //Sets Brick bounds
+                    // Sets Brick bounds
                     leftBrick = 10 * column;
                     rightBrick = 10 * column + 10;
                     topBrick = 6 * row + 1;
                     bottomBrick = 6 * row + 7;
 
-                    //If A collison has occured
+                    // If A collison has occured
                     if(topBall <= bottomBrick && bottomBall >= topBrick &&
                        leftBall <= rightBrick && rightBall >= leftBrick) {
                         // Draw score
@@ -174,9 +174,9 @@ void move_ball(Canvas* canvas) {
                         isHit[row][column] = true;
                         canvas_draw_frame(canvas, 10 * column, 2 + 6 * row, 8, 4);
 
-                        //Vertical collision
+                        // Vertical collision
                         if(bottomBall > bottomBrick || topBall < topBrick) {
-                            //Only bounce once each ball move
+                            // Only bounce once each ball move
                             if(!bounced) {
                                 dy = -dy;
                                 yb += dy;
@@ -185,9 +185,9 @@ void move_ball(Canvas* canvas) {
                             }
                         }
 
-                        //Hoizontal collision
+                        // Hoizontal collision
                         if(leftBall < leftBrick || rightBall > rightBrick) {
-                            //Only bounce once brick each ball move
+                            // Only bounce once brick each ball move
                             if(!bounced) {
                                 dx = -dx;
                                 xb += dx;
@@ -200,10 +200,10 @@ void move_ball(Canvas* canvas) {
             }
         }
 
-        //Reset Bounce
+        // Reset Bounce
         bounced = false;
     } else {
-        //Ball follows paddle
+        // Ball follows paddle
         xb = xPaddle + 5;
     }
 }
@@ -227,16 +227,16 @@ void draw_paddle(Canvas* canvas) {
 }
 
 void reset_level(Canvas* canvas) {
-    //Undraw paddle
+    // Undraw paddle
     canvas_draw_frame(canvas, xPaddle, FLIPPER_LCD_HEIGHT - 1, 11, 1);
 
-    //Undraw ball
+    // Undraw ball
     canvas_draw_dot(canvas, xb, yb);
     canvas_draw_dot(canvas, xb + 1, yb);
     canvas_draw_dot(canvas, xb, yb + 1);
     canvas_draw_dot(canvas, xb + 1, yb + 1);
 
-    //Alter various variables to reset the game
+    // Alter various variables to reset the game
     xPaddle = 54;
     yb = 60;
     brickCount = 0;
@@ -264,18 +264,18 @@ static void arkanoid_draw_callback(Canvas* const canvas, void* ctx) {
         return;
     }
 
-    //Initial level draw
+    // Initial level draw
     if(!initialDraw) {
         initialDraw = true;
 
         // Set default font for text
         canvas_set_font(canvas, FontPrimary);
 
-        //Draws the new level
+        // Draws the new level
         reset_level(canvas);
     }
 
-    //Draws new bricks and resets their values
+    // Draws new bricks and resets their values
     for(unsigned int row = 0; row < ROWS; row++) {
         for(unsigned int column = 0; column < COLUMNS; column++) {
             if(!isHit[row][column]) {
@@ -377,17 +377,17 @@ int32_t arkanoid_game_app(void* p) {
                     case InputKeyDown:
                         break;
                     case InputKeyOk:
-                        //Release ball if FIRE pressed
+                        // Release ball if FIRE pressed
                         released = true;
 
-                        //Apply random direction to ball on release
+                        // Apply random direction to ball on release
                         if(rand_range(0, 2) == 0) {
                             dx = 1;
                         } else {
                             dx = -1;
                         }
 
-                        //Makes sure the ball heads upwards
+                        // Makes sure the ball heads upwards
                         dy = -1;
                         break;
                     }
