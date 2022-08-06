@@ -1,14 +1,16 @@
 ### New changes
-* Added pack of community apps with some fixes/changes - [(Full list)](https://github.com/Eng1n33r/flipperzero-firmware#apps-included)
-* BadUSB extra keyboard layouts [(By v1nc)](https://github.com/v1nc/flipperzero-firmware) - [How to use](https://github.com/Eng1n33r/flipperzero-firmware/blob/dev/documentation/BadUSBLayouts.md)
-* UniRF app update - now its possible to select any `.txt` map file, instructions updated
-* Added ability to extend subghz frequency range
-* Updated docs and readme
+* New frequency analyzer - [(by ClusterM)](https://github.com/ClusterM) - see PR #43 for details
+* BadUSB keyboard layouts - now its possible to load keyboard layouts from microSD - [(by rien > dummy-decoy)](https://github.com/dummy-decoy/flipperzero-firmware/tree/dummy_decoy/bad_usb_keyboard_layout)
+* Simple Clock - make the clock simple while the new update is in the works
+* Lowered time required to hold back button to poweroff - from 5sec to 3sec - PR #42
+* OFW: NFC: make dict attack more interactive
+* OFW: NFC: Edit UID feature
+* OFW: MPU Hal
+* OFW: Make printf great again
+* OFW: IR remote app fixes
+* OFW: other changes
 
-- [!!!] Replace your subghz/assets/setting_user with file from `sd-card-(version).zip` because file format has been changed
-
-**Note: We changed version names, because our releases not based on official releases, now versions is called
-cg1-(commit-sha) - where "cg" = "Code Grabber", 1 = number of build(if ofw commit doesnt change), and (commit sha) - means ofw dev commit on which our version is based**
+**Note: Prefer installing using web updater or by self update package**
 
 Self-update package (update from microSD) - `flipper-z-f7-update-(version).zip`
 
