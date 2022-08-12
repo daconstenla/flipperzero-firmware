@@ -47,8 +47,8 @@ bool subghz_scene_set_seed_faac_868_on_event(void* context, SceneManagerEvent ev
 
             subghz->txrx->transmitter =
                 subghz_transmitter_alloc_init(subghz->txrx->environment, "Faac SLH");
-            subghz_preset_init(subghz, "AM650", 868350000, NULL, 0);
             if(subghz->txrx->transmitter) {
+                subghz_preset_init(subghz, "AM650", 868350000, NULL, 0);
                 subghz_protocol_faac_slh_create_data(
                     subghz_transmitter_get_protocol_instance(subghz->txrx->transmitter),
                     subghz->txrx->fff_data,
@@ -59,7 +59,6 @@ bool subghz_scene_set_seed_faac_868_on_event(void* context, SceneManagerEvent ev
                     "FAAC_SLH",
                     subghz->txrx->preset);
                 // roguemastter dont steal!!
-
                 uint8_t seed_data[sizeof(uint32_t)] = {0};
                 for(size_t i = 0; i < sizeof(uint32_t); i++) {
                     seed_data[sizeof(uint32_t) - i - 1] = (seed >> i * 8) & 0xFF;

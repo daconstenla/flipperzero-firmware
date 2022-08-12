@@ -51,7 +51,7 @@ bool ibutton_scene_rpc_on_event(void* context, SceneManagerEvent event) {
 
                     string_clear(key_name);
                     result = true;
-                } else {
+                    } else {
                     string_reset(ibutton->file_path);
                 }
             }

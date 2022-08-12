@@ -16,7 +16,7 @@ body:
     required: true
 - type: textarea
   id: repro
-  attributes: 
+  attributes:
     label: Reproduction
     description: "How can this bug be reproduced?"
     placeholder: |

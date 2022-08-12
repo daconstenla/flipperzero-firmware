@@ -47,8 +47,8 @@ bool subghz_scene_set_seed_faac_433_on_event(void* context, SceneManagerEvent ev
 
             subghz->txrx->transmitter =
                 subghz_transmitter_alloc_init(subghz->txrx->environment, "Faac SLH");
-            subghz_preset_init(subghz, "AM650", 433920000, NULL, 0);
             if(subghz->txrx->transmitter) {
+                subghz_preset_init(subghz, "AM650", 433920000, NULL, 0);
                 subghz_protocol_faac_slh_create_data(
                     subghz_transmitter_get_protocol_instance(subghz->txrx->transmitter),
                     subghz->txrx->fff_data,

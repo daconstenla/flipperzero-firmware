@@ -1,5 +1,4 @@
 #include <furi_hal_bt.h>
-#include <furi_hal_bt.h>
 #include <ble.h>
 #include <stm32wbxx.h>
 #include <shci.h>

@@ -1,22 +1,21 @@
 #include <furi.h>
+
 #include <gui/gui.h>
 #include <input/input.h>
 #include <dialogs/dialogs.h>
-#include <flipper_format/flipper_format_i.h>
-
-#include <lib/toolbox/path.h>
+#include <storage/storage.h>
 #include <notification/notification_messages.h>
-
-#include <lib/subghz/receiver.h>
-#include <lib/subghz/transmitter.h>
-#include <lib/subghz/subghz_file_encoder_worker.h>
 
 #include <assets_icons.h>
 
-#define TAG "UniRF Remix"
+#include <flipper_format/flipper_format_i.h>
+#include <lib/toolbox/path.h>
+#include <applications/subghz/subghz_i.h>
 
-#define UNIRF_APP_PATH_FOLDER "/ext/unirf"
-#define UNIRF_APP_PATH_EXTENSION ".txt"
+#define UNIRFMAP_FOLDER "/ext/unirf"
+#define UNIRFMAP_EXTENSION ".txt"
+
+#define TAG "UniRF Remix"
 
 typedef struct {
     FuriMutex* model_mutex;
@@ -39,6 +38,8 @@ typedef struct {
     string_t down_l;
     string_t ok_l;
 
+    string_t file_path;
+
     char* up_label;
     char* down_label;
     char* left_label;
@@ -58,6 +59,7 @@ typedef struct {
     int button;
 
     int file_result;
+    bool tx_not_allowed;
     int file_blank;
 
     string_t signal;
@@ -151,10 +153,9 @@ static char* extract_filename(const char* name, int len) {
 *set error flag if missing map file
 */
 
-void unirfremix_cfg_set_check(UniRFRemix* app) {
+void unirfremix_cfg_set_check(UniRFRemix* app, string_t file_name) {
     Storage* storage = furi_record_open("storage");
     FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
-    storage_common_mkdir(storage, UNIRF_APP_PATH_FOLDER);
 
     app->file_result = 3;
     app->file_blank = 0;
@@ -167,22 +168,8 @@ void unirfremix_cfg_set_check(UniRFRemix* app) {
 
     int label_len = 12;
 
-    DialogsApp* dialogs = furi_record_open("dialogs");
-    bool select_result = false;
-    string_t file_name;
-    string_init(file_name);
-    string_set_str(file_name, UNIRF_APP_PATH_FOLDER);
-    bool ret = dialog_file_browser_show(
-        dialogs, file_name, file_name, UNIRF_APP_PATH_EXTENSION, true, &I_sub1_10px, false);
-
-    furi_record_close("dialogs");
-    if(ret) {
-        select_result = true;
-    }
-
     //check that map file exists
-    if(!flipper_format_file_open_existing(fff_data_file, string_get_cstr(file_name)) &&
-       !select_result) {
+    if(!flipper_format_file_open_existing(fff_data_file, string_get_cstr(file_name))) {
         FURI_LOG_I(TAG, "Could not open MAP file %s", string_get_cstr(file_name));
     } else {
         //Filename Assignment/Check Start
@@ -359,7 +346,7 @@ void unirfremix_cfg_set_check(UniRFRemix* app) {
             FURI_LOG_I(TAG, "OK label: %s", app->ok_label);
         }
 
-        app->file_result = 4;
+        app->file_result = 2;
     }
 
     flipper_format_free(fff_data_file);
@@ -376,7 +363,7 @@ void unirfremix_cfg_set_check(UniRFRemix* app) {
 
     if(app->file_blank == 5) {
         //trigger invalid file error screen
-        app->file_result = 2;
+        app->file_result = 1;
     } else {
         //check all files
         //reset app->file_blank to redetermine if error needs to be thrown
@@ -471,13 +458,11 @@ void unirfremix_cfg_set_check(UniRFRemix* app) {
         }
 
         if(app->file_blank == 5) {
-            app->file_result = 2;
+            app->file_result = 1;
         } else {
-            app->file_result = 4;
+            app->file_result = 2;
         }
     }
-
-    string_clear(file_name);
 }
 
 static void unirfremix_end_send(UniRFRemix* app) {
@@ -489,10 +474,20 @@ static void unirfremix_send_signal(
     uint32_t frequency,
     string_t signal,
     string_t protocol) {
+    if(!furi_hal_subghz_is_tx_allowed(frequency)) {
+        printf(
+            "In your settings, only reception on this frequency (%lu) is allowed,\r\n"
+            "the actual operation of the unirf app is not possible\r\n ",
+            frequency);
+        app->tx_not_allowed = true;
+        unirfremix_end_send(app);
+        return;
+    } else {
+        app->tx_not_allowed = false;
+    }
     for(int x = 1; x <= app->repeat; x++) {
         frequency = frequency ? frequency : 433920000;
         FURI_LOG_E(TAG, "file to send: %s", string_get_cstr(signal));
-
         string_t flipper_format_string;
 
         if(strcmp(string_get_cstr(protocol), "RAW") == 0) {
@@ -514,23 +509,19 @@ static void unirfremix_send_signal(
         subghz_transmitter_deserialize(transmitter, flipper_format);
 
         furi_hal_subghz_reset();
-        furi_hal_subghz_load_preset(FuriHalSubGhzPresetOok270Async);
+        furi_hal_subghz_load_preset(FuriHalSubGhzPresetOok650Async);
         furi_hal_subghz_set_frequency_and_path(frequency);
 
-        furi_hal_subghz_reset();
-        furi_hal_subghz_load_preset(FuriHalSubGhzPresetOok270Async);
-        furi_hal_subghz_set_frequency_and_path(frequency);
-
-        printf("Transmitting at %lu, repeat %d.\r\n", frequency, x);
+        //printf("Transmitting at %lu, repeat %d.\r\n", frequency, x);
 
         furi_hal_power_suppress_charge_enter();
         furi_hal_subghz_start_async_tx(subghz_transmitter_yield, transmitter);
 
         while(!(furi_hal_subghz_is_async_tx_complete())) {
             notification_message(notification, &sequence_blink_magenta_10);
-            printf("Sending...");
+            //printf("Sending...");
             fflush(stdout);
-            furi_delay_ms(300);
+            furi_delay_ms(333);
         }
 
         furi_record_close("notification");
@@ -549,7 +540,6 @@ static void unirfremix_send_signal(
 }
 
 static void unirfremix_process_signal(UniRFRemix* app, string_t signal) {
-    furi_mutex_release(app->model_mutex);
     view_port_update(app->view_port);
 
     FURI_LOG_I(TAG, "signal = %s", string_get_cstr(signal));
@@ -596,30 +586,22 @@ static void render_callback(Canvas* canvas, void* ctx) {
 
     //setup different canvas settings
     if(app->file_result == 1) {
-        //If map is missing
-        canvas_clear(canvas);
-        canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 62, 5, AlignCenter, AlignTop, "Map file is missing!");
-        canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str_aligned(canvas, 62, 25, AlignCenter, AlignTop, "Please create");
-        canvas_draw_str_aligned(canvas, 62, 35, AlignCenter, AlignTop, "map file.");
-        canvas_draw_str_aligned(canvas, 62, 60, AlignCenter, AlignBottom, "Hold Back to Exit.");
-    } else if(app->file_result == 2) {
         //if map has no valid filenames defined
         canvas_clear(canvas);
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 62, 5, AlignCenter, AlignTop, "Invalid map file!");
+        canvas_draw_str_aligned(canvas, 62, 5, AlignCenter, AlignTop, "Config is incorrect.");
         canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str_aligned(canvas, 62, 25, AlignCenter, AlignTop, "Please reconfigure");
-        canvas_draw_str_aligned(canvas, 62, 35, AlignCenter, AlignTop, "your map file.");
+        canvas_draw_str_aligned(canvas, 62, 30, AlignCenter, AlignTop, "Please configure map.");
         canvas_draw_str_aligned(canvas, 62, 60, AlignCenter, AlignBottom, "Hold Back to Exit.");
-    } else if(app->file_result == 3) {
-        //if map has no valid filenames defined
+    } else if(app->tx_not_allowed) {
         canvas_clear(canvas);
         canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str_aligned(canvas, 62, 5, AlignCenter, AlignTop, "Config is loading.");
+        canvas_draw_str_aligned(canvas, 62, 5, AlignCenter, AlignTop, "Transmission is blocked.");
         canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str_aligned(canvas, 62, 35, AlignCenter, AlignTop, "Please wait.");
+        canvas_draw_str_aligned(canvas, 62, 15, AlignCenter, AlignTop, "Frequency is outside of");
+        canvas_draw_str_aligned(canvas, 62, 25, AlignCenter, AlignTop, "default range.");
+        canvas_draw_str_aligned(canvas, 62, 35, AlignCenter, AlignTop, "Check docs.");
+        canvas_draw_str_aligned(canvas, 62, 60, AlignCenter, AlignBottom, "Hold Back to Exit.");
     } else {
         //map found, draw all the things
         canvas_clear(canvas);
@@ -634,45 +616,57 @@ static void render_callback(Canvas* canvas, void* ctx) {
         //PNGs are located in assets/icons/UniRFRemix before compiliation
 
         //Icons for Labels
-        canvas_draw_icon(canvas, 0, 0, &I_UniRFRemix_LeftAlignedButtons_9x64);
+        //canvas_draw_icon(canvas, 0, 0, &I_UniRFRemix_LeftAlignedButtons_9x64);
+        canvas_draw_icon(canvas, 1, 5, &I_ButtonUp_7x4);
+        canvas_draw_icon(canvas, 1, 15, &I_ButtonDown_7x4);
+        canvas_draw_icon(canvas, 2, 23, &I_ButtonLeft_4x7);
+        canvas_draw_icon(canvas, 2, 33, &I_ButtonRight_4x7);
+        canvas_draw_icon(canvas, 0, 42, &I_Ok_btn_9x9);
+        canvas_draw_icon(canvas, 0, 53, &I_back_10px);
 
         //Labels
         canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str(canvas, 12, 10, app->up_label);
-        canvas_draw_str(canvas, 12, 20, app->down_label);
-        canvas_draw_str(canvas, 12, 30, app->left_label);
-        canvas_draw_str(canvas, 12, 40, app->right_label);
-        canvas_draw_str(canvas, 12, 50, app->ok_label);
+        canvas_draw_str(canvas, 10, 10, app->up_label);
+        canvas_draw_str(canvas, 10, 20, app->down_label);
+        canvas_draw_str(canvas, 10, 30, app->left_label);
+        canvas_draw_str(canvas, 10, 40, app->right_label);
+        canvas_draw_str(canvas, 10, 50, app->ok_label);
 
-        canvas_draw_str_aligned(canvas, 12, 62, AlignLeft, AlignBottom, "Repeat # - Hold to exit");
+        canvas_draw_str_aligned(
+            canvas, 11, 62, AlignLeft, AlignBottom, "Hold=Exit. Tap for Repeat:");
 
         //Status text and indicator
-        canvas_draw_str_aligned(canvas, 125, 10, AlignRight, AlignBottom, app->send_status);
+        canvas_draw_str_aligned(canvas, 126, 10, AlignRight, AlignBottom, app->send_status);
 
         switch(app->send_status_c) {
         case 0:
-            canvas_draw_icon(canvas, 110, 15, &I_UniRFRemix_Outline_14x14);
+            canvas_draw_icon(canvas, 113, 15, &I_Pin_cell_13x13);
             break;
         case 1:
-            canvas_draw_icon(canvas, 110, 15, &I_UniRFRemix_Left_14x14);
+            canvas_draw_icon(canvas, 113, 15, &I_Pin_cell_13x13);
+            canvas_draw_icon(canvas, 116, 17, &I_Pin_arrow_up7x9);
             break;
         case 2:
-            canvas_draw_icon(canvas, 110, 15, &I_UniRFRemix_Right_14x14);
+            canvas_draw_icon(canvas, 113, 15, &I_Pin_cell_13x13);
+            canvas_draw_icon(canvas, 116, 17, &I_Pin_arrow_down_7x9);
             break;
         case 3:
-            canvas_draw_icon(canvas, 110, 15, &I_UniRFRemix_Up_14x14);
+            canvas_draw_icon(canvas, 113, 15, &I_Pin_cell_13x13);
+            canvas_draw_icon(canvas, 115, 18, &I_Pin_arrow_right_9x7);
             break;
         case 4:
-            canvas_draw_icon(canvas, 110, 15, &I_UniRFRemix_Down_14x14);
+            canvas_draw_icon(canvas, 113, 15, &I_Pin_cell_13x13);
+            canvas_draw_icon(canvas, 115, 18, &I_Pin_arrow_left_9x7);
             break;
         case 5:
-            canvas_draw_icon(canvas, 110, 15, &I_UniRFRemix_Center_14x14);
+            canvas_draw_icon(canvas, 113, 15, &I_Pin_cell_13x13);
+            canvas_draw_icon(canvas, 116, 18, &I_Pin_star_7x7);
             break;
         }
 
         //Repeat indicator
         //canvas_draw_str_aligned(canvas, 125, 40, AlignRight, AlignBottom, "Repeat:");
-        canvas_draw_icon(canvas, 115, 39, &I_UniRFRemix_Repeat_12x14);
+        //canvas_draw_icon(canvas, 115, 39, &I_UniRFRemix_Repeat_12x14);
         canvas_draw_str_aligned(
             canvas, 125, 62, AlignRight, AlignBottom, int_to_char(app->repeat));
     }
@@ -683,7 +677,7 @@ static void render_callback(Canvas* canvas, void* ctx) {
 static void input_callback(InputEvent* input_event, void* ctx) {
     UniRFRemix* app = ctx;
 
-    furi_message_queue_put(app->input_queue, input_event, FuriWaitForever);
+    furi_message_queue_put(app->input_queue, input_event, 0);
 }
 
 UniRFRemix* unirfremix_alloc() {
@@ -698,7 +692,7 @@ UniRFRemix* unirfremix_alloc() {
     view_port_input_callback_set(app->view_port, input_callback, app);
 
     // Open GUI and register view_port
-    app->gui = furi_record_open("gui");
+    app->gui = furi_record_open(RECORD_GUI);
     gui_add_view_port(app->gui, app->view_port, GuiLayerFullscreen);
 
     return app;
@@ -718,8 +712,10 @@ void unirfremix_free(UniRFRemix* app) {
     string_clear(app->right_l);
     string_clear(app->ok_l);
 
+    string_clear(app->file_path);
+
     gui_remove_view_port(app->gui, app->view_port);
-    furi_record_close("gui");
+    furi_record_close(RECORD_GUI);
     view_port_free(app->view_port);
 
     furi_message_queue_free(app->input_queue);
@@ -732,6 +728,8 @@ void unirfremix_free(UniRFRemix* app) {
 int32_t unirfremix_app(void* p) {
     UNUSED(p);
     UniRFRemix* app = unirfremix_alloc();
+
+    string_init(app->file_path);
 
     //setup variables before population
     string_init(app->up_file);
@@ -749,12 +747,29 @@ int32_t unirfremix_app(void* p) {
 
     app->file_result = 3;
 
-    //check map and population variables
-    unirfremix_cfg_set_check(app);
+    Storage* storage = furi_record_open("storage");
+    if(!storage_simply_mkdir(storage, UNIRFMAP_FOLDER)) {
+        FURI_LOG_E(TAG, "Could not create folder %s", UNIRFMAP_FOLDER);
+    }
+    furi_record_close("storage");
+
+    string_set_str(app->file_path, UNIRFMAP_FOLDER);
+
+    DialogsApp* dialogs = furi_record_open(RECORD_DIALOGS);
+    bool res = dialog_file_browser_show(
+        dialogs, app->file_path, app->file_path, UNIRFMAP_EXTENSION, true, &I_sub1_10px, false);
+
+    furi_record_close(RECORD_DIALOGS);
+    if(!res) {
+        FURI_LOG_E(TAG, "No file selected");
+    } else {
+        //check map and population variables
+        unirfremix_cfg_set_check(app, app->file_path);
+    }
 
     bool exit_loop = false;
 
-    if(app->file_result == 4) {
+    if(app->file_result == 2) {
         FURI_LOG_I(
             TAG,
             "U: %s - D: %s - L: %s - R: %s - O: %s ",
@@ -793,7 +808,7 @@ int32_t unirfremix_app(void* p) {
                         if(app->processing == 0) {
                             *app->signal = *app->empty;
                             *app->signal = *app->up_file;
-                            app->button = 3;
+                            app->button = 1;
                             app->processing = 1;
                         }
                     }
@@ -806,7 +821,7 @@ int32_t unirfremix_app(void* p) {
                         if(app->processing == 0) {
                             *app->signal = *app->empty;
                             *app->signal = *app->down_file;
-                            app->button = 4;
+                            app->button = 2;
                             app->processing = 1;
                         }
                     }
@@ -819,7 +834,7 @@ int32_t unirfremix_app(void* p) {
                         if(app->processing == 0) {
                             *app->signal = *app->empty;
                             *app->signal = *app->right_file;
-                            app->button = 1;
+                            app->button = 3;
                             app->processing = 1;
                         }
                     }
@@ -832,7 +847,7 @@ int32_t unirfremix_app(void* p) {
                         if(app->processing == 0) {
                             *app->signal = *app->empty;
                             *app->signal = *app->left_file;
-                            app->button = 2;
+                            app->button = 4;
                             app->processing = 1;
                         }
                     }
@@ -908,7 +923,7 @@ int32_t unirfremix_app(void* p) {
             furi_mutex_release(app->model_mutex);
             view_port_update(app->view_port);
         }
-    } else {
+    } else if(app->file_result == 1) {
         //refresh screen to update variables before processing main screen or error screens
         view_port_update(app->view_port);
 
@@ -948,6 +963,8 @@ int32_t unirfremix_app(void* p) {
             furi_mutex_release(app->model_mutex);
             view_port_update(app->view_port);
         }
+    } else {
+        furi_mutex_release(app->model_mutex);
     }
 
     // remove & free all stuff created by app

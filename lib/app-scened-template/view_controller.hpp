@@ -26,6 +26,7 @@ public:
            0)...);
 
         gui = static_cast<Gui*>(furi_record_open("gui"));
+        view_dispatcher_attach_to_gui(view_dispatcher, gui, ViewDispatcherTypeFullscreen);
     };
 
     ~ViewController() {
@@ -93,10 +94,6 @@ public:
     void send_event(typename TApp::Event* event) {
         FuriStatus result = furi_message_queue_put(event_queue, event, FuriWaitForever);
         furi_check(result == FuriStatusOk);
-    }
-
-    void attach_to_gui(ViewDispatcherType type) {
-        view_dispatcher_attach_to_gui(view_dispatcher, gui, type);
     }
 
 private:

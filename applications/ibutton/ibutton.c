@@ -87,8 +87,8 @@ static void ibutton_rpc_command_callback(RpcAppSystemEvent event, void* context)
     if(event == RpcAppEventSessionClose) {
         view_dispatcher_send_custom_event(
             ibutton->view_dispatcher, iButtonCustomEventRpcSessionClose);
-        rpc_system_app_set_callback(ibutton->rpc_ctx, NULL, NULL);
-        ibutton->rpc_ctx = NULL;
+            rpc_system_app_set_callback(ibutton->rpc_ctx, NULL, NULL);
+            ibutton->rpc_ctx = NULL;
     } else if(event == RpcAppEventAppExit) {
         view_dispatcher_send_custom_event(ibutton->view_dispatcher, iButtonCustomEventRpcExit);
     } else if(event == RpcAppEventLoadFile) {
@@ -248,12 +248,6 @@ bool ibutton_save_key(iButton* ibutton, const char* key_name) {
             ibutton_delete_key(ibutton);
 
             // Remove old key name from path
-            size_t filename_start = string_search_rchar(ibutton->file_path, '/');
-            string_left(ibutton->file_path, filename_start);
-        }
-
-        // Set full file name, for new key
-        if(string_end_with_str_p(ibutton->file_path, IBUTTON_APP_EXTENSION)) {
             size_t filename_start = string_search_rchar(ibutton->file_path, '/');
             string_left(ibutton->file_path, filename_start);
         }

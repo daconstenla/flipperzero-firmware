@@ -256,12 +256,8 @@ static int32_t browser_worker(void* context) {
     string_init_set_str(path, BROWSER_ROOT);
     browser->item_sel_idx = -1;
 
-    // If start path is a path to the file - try finding index of this file in a folder
     string_t filename;
     string_init(filename);
-    if(browser_path_is_file(browser->path_next)) {
-        path_extract_filename(browser->path_next, filename, false);
-    }
 
     furi_thread_flags_set(furi_thread_get_id(browser->thread), WorkerEvtConfigChange);
 

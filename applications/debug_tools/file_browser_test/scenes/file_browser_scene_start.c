@@ -2,7 +2,6 @@
 #include <furi_hal.h>
 #include <gui/modules/widget_elements/widget_element_i.h>
 #include <storage/storage.h>
-#include "gui/modules/widget_elements/widget_element_i.h"
 
 static void
     file_browser_scene_start_ok_callback(GuiButtonType result, InputType type, void* context) {

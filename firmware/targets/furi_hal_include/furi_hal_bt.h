@@ -81,7 +81,7 @@ bool furi_hal_bt_is_testing_supported();
 bool furi_hal_bt_start_app(FuriHalBtProfile profile, GapEventCallback event_cb, void* context);
 
 /** Reinitialize core2
- *
+ * 
  * Also can be used to prepare core2 for stop modes
  */
 void furi_hal_bt_reinit();

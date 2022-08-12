@@ -19,26 +19,18 @@ void set_random_name(char* name, uint8_t max_name_size) {
     };
 
     const char* suffix[] = {
-        "access",
-        "anomalija",
-        "artefact",
-        "burer",
-        "corridor",
-        "crack",
         "door",
-        "doorway",
         "entrance",
-        "entree",
+        "doorway",
         "entry",
-        "habar",
-        "maslina",
-        "monolit",
+        "portal",
+        "entree",
         "opening",
+        "crack",
+        "access",
+        "corridor",
         "passage",
         "port",
-        "portal",
-        "sidorovich",
-        "sus",
     };
     uint8_t prefix_i = rand() % COUNT_OF(prefix);
     uint8_t suffix_i = rand() % COUNT_OF(suffix);

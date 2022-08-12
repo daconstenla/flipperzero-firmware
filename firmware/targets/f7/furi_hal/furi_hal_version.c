@@ -262,8 +262,6 @@ const char* furi_hal_version_get_hw_region_name() {
         return "R02";
     case FuriHalVersionRegionJp:
         return "R03";
-    case FuriHalVersionRegionWorld:
-        return "R04";
     }
     return "R??";
 }
